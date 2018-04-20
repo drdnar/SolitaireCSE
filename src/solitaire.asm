@@ -223,7 +223,7 @@ Restart:
 	ld	hl, rngState
 	ld	(hl), a
 	ld	de, rngState + 1
-	ld	bc, end_of_game_vars - rngState - 1
+	ld	bc, end_of_screen_var - rngState - 1
 	ldir
 	; Initialize variables
 	ld	a, klondikeGame

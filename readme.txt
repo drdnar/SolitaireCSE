@@ -2,7 +2,7 @@
 
 
                                    Solitaire
-                                13 November 2014
+                                10 January 2014
 
 
 
@@ -237,12 +237,17 @@ FreeCell for me.
 
 ------ Change Log --------------------------------------------------------------
 
+Build 1054 (10 January 2014)
+ - Fix bug with MODE quitting from FreeCell.  Upon restart, the game might still
+   see the MODE key in the key buffer and immediately quit again unless you held
+   down another key to push something new into the key buffer.
+ - Unless new bugs are discovered or somebody has a better idea for the face
+   card graphics, this is the last update.
+
 Build 1052 (13 November 2014)
  - Calculator will no longer disconnect when you start Solitaire.  But it won't
    respond to TI Connect, either.
  - 248 free bytes remaining
- - Unless new bugs are discovered or somebody has a better idea for the face
-   card graphics, this is the last update.
 
 Build 1050 (13 November 2014)
  - Fixed stack overflow issue that would happen if you played more than 200ish
