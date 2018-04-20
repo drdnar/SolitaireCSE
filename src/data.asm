@@ -78,11 +78,11 @@ klondikeWinDialog:
 	.dw	MainMenu				; Button 2 callback
 	.db	"YOU WIN", 0				; Title text
 	.db	"Score:", 0				; Line 1
-	.db	"Time:", 0				; Line 2
-	.db	"Time bonus: ", 0			; Line 3
-	.db	"Games won:", 0				; Line 4
-	.db	"Games forfeit:", 0			; Line 5
-	.db	"", 0					; Line 6
+	.db	"High score:", 0			; Line 2
+	.db	"Time:", 0				; Line 3
+	.db	"Time bonus: ", 0			; Line 4
+	.db	"Games won:", 0				; Line 5
+	.db	"Games forfeit:", 0			; Line 6
 	.db	"", 0					; Line 7
 	.db	"", 0					; Line 8
 	.db	"AGAIN", 0				; Button 1 text

@@ -1004,6 +1004,7 @@ abort:
 
 ;------ Check for Win Condition ------------------------------------------------
 _kdCheckWin:
+;	jr	{@}
 	ld	l, homeCellNo0
 	call	GetStackDepth
 	cp	13
@@ -1020,7 +1021,7 @@ _kdCheckWin:
 	call	GetStackDepth
 	cp	13
 	jp	c, CardsPlayLoop
-	ld	a, (selectedGame)
+@:	ld	a, (selectedGame)
 	and	3
 	ld	(selectedGame), a
 	; Time bonus
@@ -1058,32 +1059,36 @@ TIME_BONUS_BASE	.equ	60000
 	bit	7, h
 	jr	nz, {@}
 	ld	(kdGamesWon), hl
-@:	ld	de, (kdHighScore)
-	ld	hl, (kdScore)
-	cpHlDe
-	jr	c, {@}
-	ld	(kdHighScore), hl
 @:	ld	ix, klondikeWinDialog
 	jp	ShowModalDialog
 klondikeWinDrawback:
 	ld	hl, 91
-	ld	d, 80
+	ld	d, 92
 	call	Locate
 	call	_showTime
 	ld	ix, {@}
-	jp	ShowNumbers
-@:	.db	4
+	call	ShowNumbers
+	ld	de, (kdHighScore)
+	ld	hl, (kdScore)
+	cpHlDe
+	ret	c
+	ld	(kdHighScore), hl
+	ret
+@:	.db	5
 	.dw	100
 	.db	68
 	.dw	kdScore
-	.dw	129
-	.db	92
-	.dw	selectedDepth
+	.dw	127
+	.db	80
+	.dw	kdHighScore
 	.dw	129
 	.db	104
+	.dw	selectedDepth
+	.dw	129
+	.db	116
 	.dw	kdGamesWon
 	.dw	147
-	.db	116
+	.db	128
 	.dw	kdGamesQuit
 
 

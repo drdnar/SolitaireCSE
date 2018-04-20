@@ -9,6 +9,7 @@
 ;  - Graphics for face cards
 ;  - Change graphics in FreeCell:
 ;     - FREECELL should have a box, no label for Home
+;  - Automove in FreeCell doesn't correctly consider all free cells?
 
 .nolist
 .include "ti84pcse.inc"
@@ -688,5 +689,8 @@ EchoWord(InterruptHandler)
 .echo	"IVT & ISR burned space: ", interrupt_burn_end - interrupt_burn_start, " bytes\n"
 .echo	"Total program code & data: ", program_end - program_start, " bytes\n"
 .echo	"Space remaining: ", 7FBBh - program_end, " bytes\n"
+.ifdef	FREECELL_DEBUG
+.echo	"\n\nWARNING: FREECELL ALLOWS ALL MOVES\n\n\n"
+.endif
 ;.echo	" size: ", _end - _start, " bytes"
-.echo	"\n"
+;.echo	"\n"

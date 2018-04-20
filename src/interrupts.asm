@@ -80,8 +80,8 @@ SetUpInterrupts:
 	out	(pIntMask), a
 	im	2
 	ret
-InterruptServiceRoutine:
-	jp	RealIsr
+;InterruptServiceRoutine:
+;	jp	RealIsr
 
 
 ;------ Interrupt Service Routine ----------------------------------------------

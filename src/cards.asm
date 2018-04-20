@@ -62,6 +62,17 @@ deckCell	.equ	dealCell + 12
 deckCellNo	.equ	19
 numberOfStacks	.equ	20
 
+; struct stack
+; {
+;	byte cardCount; // Also used for flags
+;	word column;
+;	byte row;
+;	byte stackBelow;
+;	byte stackLeft;
+;	byte stackRight;
+;	byte stackAbove;
+;	byte cards[]; // Anywhere from 1 to 24, depending on stack
+; }
 stackStatus	.equ	0
 stackColumn	.equ	1
 stackRow	.equ	3
@@ -71,18 +82,18 @@ stackMoveRight	.equ	6
 stackMoveUp	.equ	7
 stackCards	.equ	8
 
-stackActiveM	.equ	80h
-stackActive	.equ	7
+;stackActiveM	.equ	80h
+;stackActive	.equ	7
 stackCountM	.equ	1Fh
-stackHideHidden	.equ	6
-stackHideHiddenM	.equ	40h
-stackShowOnlyTop	.equ	5
-stackShowOnlyTopM	.equ	20h
+stackHideHidden	.equ	6	; Bit set if stack should hide cards marked as hidden
+stackHideHiddenM	.equ	40h	; (Used very weirdly, actually)
+stackShowOnlyTop	.equ	5	; Bit set if only the top card should be visible
+stackShowOnlyTopM	.equ	20h	; Used for the home cells/foundations
 
-cardNotVisible	.equ	6
+cardNotVisible	.equ	6	; Bit set if the card is flipped so user cannot see it
 cardNotVisibleM	.equ	40h
-notACard	.equ	63
-cardTypeMask	.equ	63
+notACard	.equ	63	; Dummy value that indicates an illegal card
+cardTypeMask	.equ	63	; If the program ever displays this card, it'll panic
 
 cardWidth	.equ	26
 cardHeight	.equ	39
@@ -1265,131 +1276,6 @@ _gcl0:
 	ex	de, hl
 	ld	e, cardHeight
 	jr	_gcl9
-
-
-#ifdef	NEVER
-;------ GetCardLocation --------------------------------------------------------
-;GetCardLocation:
-; Returns the location of a card given its stack and depth in stack.
-; Inputs:
-;  - L: Stack number
-;  - A: Depth in stack
-; Outputs:
-;  - HL: Column
-;  - D: Row
-;  - E: Height
-;  - Width = 26 pixels
-;  - A: Information
-;     - Card
-;     - Card is top card
-;     - Card is not visible
-; Destroys:
-;  - AF
-;  - BC
-;  - DE
-;  - HL
-	push	ix
-	ld	ix, 0
-	add	ix, sp
-	push	af	; ix - 1, ix - 2
-	; Get location of stack from stack number
-	ld	h, 0
-	add	hl, hl
-	ld	de, stacksTable
-	add	hl, de
-	ld	a, (hl)
-	inc	hl
-	ld	h, (hl)
-	ld	l, a
-	ld	a, (hl)
-	inc	hl
-	bit	stackShowOnlyTop, a
-	jr	z, _gcla
-	; Show only top card
-	ld	e, (hl)
-	inc	hl
-	ld	d, (hl)
-	inc	hl
-	ld	b, (hl)
-	ld	a, (ix - 1)
-	add	a, 5
-	add	a, l
-	jr	nc, $ + 3
-	inc	h
-	ld	l, a
-	ld	a, (hl)
-	ex	de, hl
-	ld	d, b
-	ld	e, cardHeight
-	pop	ix
-	pop	ix
-	ret
-_gcla:	ld	(ix - 2), 13 - 4	; => Height of each card
-	; Is card shrinking an issue?
-	bit	stackHideHidden, a
-	jr	z, {@}
-	and	stackCountM
-;	or	a		; redundant. . . .
-;	jr	z, _gclz	; Empty stack
-	cp	19
-	jr	c, {@}
-	dec	(ix - 2)
-@:	and	stackCountM
-	jr	z, _gclz	; Empty stack
-	cp	(ix - 1)
-	ld	c, (ix - 2)	; C = height, temporarily
-	jr	c, _gclc
-	; A >= actual card count, so copy actual card count into and use that instead.
-	ld	a, (ix - 1)
-	; Also, set returned card height
-	ld	c, cardHeight
-_gclc:	ld	b, a
-	; Fetch column of stack
-	ld	e, (hl)
-	inc	hl
-	ld	d, (hl)
-	inc	hl
-	push	de
-	; Fetch row
-	ld	d, (hl)
-	inc	hl
-	inc	hl
-	inc	hl
-	inc	hl
-	inc	hl
-	; Iterate over cards
-	ld	e, c		; Now E = height, for remainder of function
-	; If the requested card is card 0, don't iterate over 256 cards.
-	ld	a, (hl)
-	xor	a
-	cp	b
-	jr	z, _gcle
-	ld	a, d
-_gcld:	add	a, 4
-	bit	cardNotVisible, (hl)
-	inc	hl
-	jr	nz, {@}
-	add	a, (ix - 2)
-@:	djnz	_gcld
-	ld	d, a
-_gcle:	pop	hl
-_gclr:	pop	ix
-	pop	ix
-	ret
-
-_gclz:
-	jp	Quit
-
-	ld	e, (hl)
-	inc	hl
-	ld	d, (hl)
-	inc	hl
-	ld	h, (hl)
-	ex	de, hl
-	ld	e, cardHeight
-	ld	a, notACard
-	jr	_gclr
-#endif
 
 
 ;------ DrawStackAndEraseBelowIfNecessary --------------------------------------

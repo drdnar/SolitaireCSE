@@ -22,8 +22,8 @@ PutS:
 	or	a
 	scf
 	ret	z
-	cp	chNewLine
-	jr	z, putSNewLine
+;	cp	chNewLine
+;	jr	z, putSNewLine
 	
 	push	hl
 	push	de
@@ -41,19 +41,20 @@ PutS:
 	inc	hl
 	call	PutC
 	jr	PutS
-putSNewLine:
-	push	hl
-	call	ClearEOL
-	ld	a, (lcdRow)
-	add	a, charHeight
-	ld	(lcdRow), a
-	ld	hl, 0
-	ld	(lcdCol), hl
-	call	FixCursor
-	pop	hl
-	jr	PutS
+;putSNewLine:
+;	push	hl
+;	call	ClearEOL
+;	ld	a, (lcdRow)
+;	add	a, charHeight
+;	ld	(lcdRow), a
+;	ld	hl, 0
+;	ld	(lcdCol), hl
+;	call	FixCursor
+;	pop	hl
+;	jr	PutS
 
 
+.ifdef	NEVER
 ;------ PutSCentered -----------------------------------------------------------
 PutSCentered:
 ; Displays a string, centering it.  However, if the string contains control
@@ -89,6 +90,7 @@ PutSCentered:
 	pop	hl
 	call	PutS
 	ret
+.endif
 
 
 ;------ Locate -----------------------------------------------------------------
@@ -401,6 +403,7 @@ ResetScreen:
 	ret
 
 
+.ifdef	NEVER
 ;------ ClearEOL ---------------------------------------------------------------
 ClearEOL:
 ; Clears the rest of the line of text.
@@ -433,6 +436,7 @@ _cll:	out	(pLcdData), a
 	out	(pLcdData), a
 	djnz	_cll
 	jr	clearLoop
+.endif
 
 
 ;------ FixCursor --------------------------------------------------------------

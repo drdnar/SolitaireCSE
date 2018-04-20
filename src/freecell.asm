@@ -497,6 +497,10 @@ _superMove:
 	ld	c, a
 	ld	a, (currentStack)
 	ld	l, a
+	push	hl
+	call	GetStackDepth
+	pop	hl
+	jr	z, {@}
 	ld	a, (currentDepth)
 	call	GetCard
 	call	CanBeStacked
@@ -515,7 +519,7 @@ _superMove:
 ;	add	a, 4
 ;	cp	b
 ;	jp	nz, _er;_ab4;_abortMove
-	; Check if there are enough free cells
+@:	; Check if there are enough free cells
 	ld	c, 0
 	ld	a, (fcFreeCells)
 	dec	a
@@ -833,7 +837,7 @@ freeCellWinDrawback:
 	.dw	96
 	.db	68
 	.dw	fcGameNumber
-	.dw	96
+	.dw	102
 	.db	80
 	.dw	fcMoves
 
