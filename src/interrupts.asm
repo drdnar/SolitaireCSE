@@ -55,9 +55,9 @@ SetUpInterrupts:
 	; And kill USB
 	out	(57h), a
 	out	(5Bh), a
-	out	(4Ch), a
-	ld	a, 2
-	out	(54h), a
+;	out	(4Ch), a
+;	ld	a, 2
+;	out	(54h), a
 	; RAM-Resident Routines
 	ld	hl, ScanKeyboardSource
 	ld	de, ScanKeyboard

@@ -237,6 +237,13 @@ FreeCell for me.
 
 ------ Change Log --------------------------------------------------------------
 
+Build 1052 (13 November 2014)
+ - Calculator will no longer disconnect when you start Solitaire.  But it won't
+   respond to TI Connect, either.
+ - 248 free bytes remaining
+ - Unless new bugs are discovered or somebody has a better idea for the face
+   card graphics, this is the last update.
+
 Build 1050 (13 November 2014)
  - Fixed stack overflow issue that would happen if you played more than 200ish
    games without exiting the app
@@ -247,8 +254,6 @@ Build 1050 (13 November 2014)
  - Plugging in a USB cable no longer causes an abort
  - Optimized some code for size
  - 238 free bytes remaining
- - Unless new bugs are discovered or somebody has a better idea for the face
-   card graphics, this is the last update.
 
 Build 1000 (9 May 2014)
  - Fixed supermove free cell count; now each free tableau slot doubles count as

@@ -572,8 +572,8 @@ saveAndQuitCont:
 	ld	a, 1011b
 	out	(pIntMask), a
 	; Re-enable USB
-	ld	a, 50h
-	out	(57h), a
+;	ld	a, 50h
+;	out	(57h), a
 	im	1
 	ei
 .ifdef	NEVER
