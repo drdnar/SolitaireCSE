@@ -12,14 +12,19 @@
 ; TODO:
 ;  - Make more moves release currently selected card
 ;  - Anti-battery drain: If same key repeats 255 times, APD
-;  - Graphics for face cards
+;     - (Because, you know, that would mean that something is laying on top of
+;       the calculator.)
+;  + Graphics for face cards
 ;  - Change graphics in FreeCell:
 ;     - FREECELL should have a box, no label for Home
 ;  - Can we instant abort by using PowerOff instead of paging back into the app?
 ;  - Pressing UP at top of stack should move to bottom
 ;  - DrawHiddenCardHeader can possibly be optimized; it seems it would be smaller
 ;    to make it a monochrome sprite
-;  - DrawStack can probably be simplified by calling GetCardLocation
+;  + DrawStack can probably be simplified by calling GetCardLocation
+;     - This was a terrible idea.  It saved nine bytes.
+;  - Could save up to 200 bytes net-total by Huffman compressing all text
+;  - Could possibly save lots of space (200 bytes?) by RLE compressing face card graphics
 
 ; So here's an overview of how Solitaire works:
 ;  - The OS passes control to Solitaire
@@ -220,6 +225,17 @@ Restart:
 	ld	de, rngState + 1
 	ld	bc, end_of_game_vars - rngState - 1
 	ldir
+	; Initialize variables
+	ld	a, klondikeGame
+	ld	(selectedGame), a
+	ld	a, 3
+	ld	(kdDrawCount), a
+	ld	a, 1
+	ld	(kdTimed), a
+	xor	a
+	ld	(kdScoringMode), a
+	ld	hl, 4
+	ld	(fcFreeCells), hl
 	; Saving
 	;xor	a ; Recycled from above
 	ld	(saveError), a
@@ -228,7 +244,6 @@ Restart:
 	b_call(_ChkFindSym)
 	jp	nc, _dontCreateAppVar
 ; Appvar not found
-	call	_initalizeKnownGoodSettings
 	; Create appvar
 	ld	a, seLowRam
 	ld	(saveError), a
@@ -278,19 +293,6 @@ Restart:
 	; And done.
 	jp	_appvarStuffDone
 
-_initalizeKnownGoodSettings:	; Initialize variables
-	ld	a, klondikeGame
-	ld	(selectedGame), a
-	ld	a, 3
-	ld	(kdDrawCount), a
-	ld	a, 1
-	ld	(kdTimed), a
-	xor	a
-	ld	(kdScoringMode), a
-	ld	hl, 4
-	ld	(fcFreeCells), hl
-	ret
-
 ; Appvar found
 _dontCreateAppVar:
 	; Is appvar in RAM?
@@ -314,7 +316,6 @@ _dontCreateAppVar:
 	ld	(saveError), a
 	xor	a
 	ld	(saveVarMode), a
-	call	_initalizeKnownGoodSettings
 	jp	_appvarStuffDone
 @:	; Unarchive variable
 	b_call(_Arc_Unarc)
@@ -359,7 +360,6 @@ _appvarInRam:
 	ld	(saveError), a
 	xor	a
 	ld	(saveVarMode), a
-	call	_initalizeKnownGoodSettings
 	jp	_appvarStuffDone
 @:	xor	a
 	ld	(saveError), a
@@ -496,103 +496,10 @@ _appvarStuffDone:
 	
 ;====== Termination ============================================================
 SaveAndQuit:
+	di
 	ld	iy, flags
-	ld	a, (saveVarMode)
-	or	a
-	jp	z, Quit
-	cp	2
-	jr	nc, {@}
-	ld	a, (selectedGame)
-	and	3
-	ld	(selectedGame), a
-@:	; Empty appvar
-	ld	hl, (saveAddress)
-	ld	e, (hl)
-	inc	hl
-	ld	d, (hl)
-	inc	hl
-	ld	a, e
-	or	d
-	call	z, Panic
-	di
-	b_call(_DelMem)
-	ei
-	; . . . and allocate it back again
-	ld	de, (saveAddress)
-	inc	de
-	inc	de
-	ld	hl, saveStatsSize
-	di
-	b_call(_InsertMem)
-	ei	; I'm dubious about whether this is safe. . . .
-	ld	hl, (saveAddress)
-	ld	(hl), saveStatsSize & 255
-	inc	hl
-	ld	(hl), saveStatsSize >> 8
-	; Save appvar exists, so there must be sufficient space to save stats
-	ld	de, (saveAddress)
-	inc	de
-	inc	de
-	; Header
-	ld	hl, appvarHeader
-	ld	bc, appvarHeader_end - appvarHeader
-	ldir
-	; Stats
-	ld	hl, first_saved_var
-	ld	bc, end_of_game_vars - first_saved_var
-	ldir
-;	ld	(guiTemp), de
-	; Should we save a game?
-	ld	a, (saveVarMode)
-	cp	2
-	jr	c, _saveDone
-; Is there a game in progress to save?
-	ld	a, (selectedGame)
-	bit	7, a
-	jr	z, _saveDone
-	; Allocate more memory
-	push	de
-	ld	hl, saveGameSize - saveStatsSize
-	di
-	b_call(_InsertMem)
-	ei
-	ld	hl, (saveAddress)
-	ld	(hl), saveGameSize & 255
-	inc	hl
-	ld	(hl), saveGameSize >> 8
-	pop	de
-	; Save deck
-	ld	hl, deck
-	ld	bc, 32
-	ldir
-	; Save stacks
-	call	SaveStacks
-; Save undo stack
-	ld	a, (saveVarMode)
-	cp	3
-	jr	c, _saveDone
-	; Allocate more memory
-	push	de
-	ld	hl, saveUndoSize - saveGameSize
-	di
-	b_call(_InsertMem)
-	ei
-	ld	hl, (saveAddress)
-	ld	(hl), saveUndoSize & 255
-	inc	hl
-	ld	(hl), saveUndoSize >> 8
-	pop	de
-	ld	hl, undoStack
-	ld	bc, 768
-	ldir
-_saveDone:
-	bit	rearchiveSaveVar, (iy + saveVarFlags)
-	jr	z, Quit
-	ld	hl, appvarName
-	rst	rMOV9TOOP1
-	b_call(_Arc_Unarc)
-	jr	Quit
-	
+	set	updateSaveVar, (iy + saveVarFlags)
+	jr	saveAndQuitCont
 
 ;------ Panic routine ----------------------------------------------------------
 errorText:	.db	"BUG CHECK: ", 0
@@ -648,6 +555,8 @@ Panic:
 Quit:
 	di
 	ld	iy, flags
+	res	updateSaveVar, (iy + saveVarFlags)
+saveAndQuitCont:
 	; Screen
 	xor	a
 	out	(pLcdCmd), a
@@ -662,8 +571,40 @@ Quit:
 	; Interrupts
 	ld	a, 1011b
 	out	(pIntMask), a
+	; Re-enable USB
+	ld	a, 50h
+	out	(57h), a
 	im	1
 	ei
+.ifdef	NEVER
+	; Re-enable USB
+	; TODO: This doesn't reset port 54h (pUsbSuspendCtrl)
+	;Hold the USB controller in reset
+	xor	a
+	out	(4Ch), a
+	;Enable protocol interrupts
+	ld	a, 1
+	out	(5Bh), a
+	ld	a, 0FFh
+	out	(87h), a
+	xor	a
+	out	(92h), a
+	ld	a, 0C0h
+	out	(57h), a
+	in	a, (87h)
+	ld	a, 0Eh
+	out 	(89h), a
+	ld	a, 0FFh
+	out	(8Bh), a
+	;Release the controller reset
+WaitForControllerReset:
+	in	a, (4Ch)
+	and	2	;bit	1, a
+	jr	z, WaitForControllerReset
+	ld	a, 8
+	out	(4Ch), a
+	xor	a
+.endif
 	; More screen stuff
 ;	This doesn't need to be cleared because I don't touch it.
 ;	ld	hl, cmdShadow 
@@ -677,7 +618,6 @@ Quit:
 ;	ld	(hl), '!'
 ;	ld	bc, 259
 ;	ldir
-	b_call(_DelRes)
 	b_call(_DrawStatusBarInfo)
 ; Use these if you're a RAM program
 ;	b_call(_DrawStatusBar)
@@ -694,11 +634,101 @@ Quit:
 	halt
 	b_call(_GetCSC)
  	res	appLockMenus, (iy + appFlags)
+	bit	updateSaveVar, (iy + saveVarFlags)
+	jp	z, noSave
+	ld	a, (saveVarMode)
+	or	a
+	jp	z, noSave
+	cp	2
+	jr	nc, {@}
+	ld	a, (selectedGame)
+	and	3
+	ld	(selectedGame), a
+@:	; Empty appvar
+	ld	hl, (saveAddress)
+	ld	e, (hl)
+	inc	hl
+	ld	d, (hl)
+	inc	hl
+	ld	a, e
+	or	d
+	call	z, Panic
+	b_call(_DelMem)
+	; . . . and allocate it back again
+	ld	de, (saveAddress)
+	inc	de
+	inc	de
+	ld	hl, saveStatsSize
+	b_call(_InsertMem)
+	; I'm dubious about whether this is safe. . . .
+	ld	hl, (saveAddress)
+	ld	(hl), saveStatsSize & 255
+	inc	hl
+	ld	(hl), saveStatsSize >> 8
+	; Save appvar exists, so there must be sufficient space to save stats
+	ld	de, (saveAddress)
+	inc	de
+	inc	de
+	; Header
+	ld	hl, appvarHeader
+	ld	bc, appvarHeader_end - appvarHeader
+	ldir
+	; Stats
+	ld	hl, first_saved_var
+	ld	bc, end_of_game_vars - first_saved_var
+	ldir
+;	ld	(guiTemp), de
+	; Should we save a game?
+	ld	a, (saveVarMode)
+	cp	2
+	jr	c, _saveDone
+	; Is there a game in progress to save?
+	ld	a, (selectedGame)
+	bit	7, a
+	jr	z, _saveDone
+	; Allocate more memory
+	push	de
+	ld	hl, saveGameSize - saveStatsSize
+	b_call(_InsertMem)
+	ld	hl, (saveAddress)
+	ld	(hl), saveGameSize & 255
+	inc	hl
+	ld	(hl), saveGameSize >> 8
+	pop	de
+	; Save deck
+	ld	hl, deck
+	ld	bc, 32
+	ldir
+	; Save stacks
+	call	SaveStacks
+; Save undo stack
+	ld	a, (saveVarMode)
+	cp	3
+	jr	c, _saveDone
+	; Allocate more memory
+	push	de
+	ld	hl, saveUndoSize - saveGameSize
+	b_call(_InsertMem)
+	ld	hl, (saveAddress)
+	ld	(hl), saveUndoSize & 255
+	inc	hl
+	ld	(hl), saveUndoSize >> 8
+	pop	de
+	ld	hl, undoStack
+	ld	bc, 768
+	ldir
+_saveDone:
+	bit	rearchiveSaveVar, (iy + saveVarFlags)
+	jr	z, noSave
+	ld	hl, appvarName
+	rst	rMOV9TOOP1
+	b_call(_Arc_Unarc)
+noSave:
+	b_call(_DelRes)
 	bit	setApdNow, (iy + mSettings)
-	jr	nz, quitPowerOff
+	jr	nz, {@}
 	bjump(_JForceCmdNoChar)
-quitPowerOff:
-	bcall(_PowerOff)
+@:	bcall(_PowerOff)
 generic_stuff_end:
 
 
@@ -770,7 +800,7 @@ program_end:
 .echo	"RawGetCSC size: ", RawGetCSCEnd - RawGetCSCSource, " bytes\n"
 .echo	"RealIsr size: ", RealIsrEnd - RealIsrSource, " bytes\n"
 .echo	"FixPage size: ", FixPageEnd - FixPageSource, " bytes\n"
-.echo	"Initalization & termination code size: ", generic_stuff_end - generic_stuff_start, " bytes\n"
+.echo	"Initialization & termination code size: ", generic_stuff_end - generic_stuff_start, " bytes\n"
 .echo	"Main menu size: ", mainmenu_end - mainmenu_start, " bytes\n"
 .echo	" Main menu GUI elemnts: ", gui_table_end - gui_table_start, " bytes\n"
 .echo	" Main menu RAM GUI elements: ", gui_table_end - guiRam_start, " bytes\n"

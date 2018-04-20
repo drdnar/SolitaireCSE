@@ -40,7 +40,7 @@ aboutDialog:
 	.db	"ABOUT SOLITAIRE", 0			; Title text
 	.db	"Written by Dr. D'nar.", 0		; Line 1
 	.db	"", 0					; Line 2
-	.db	"Optimization by Xeda.", 0		; Line 3
+	.db	"Optimized by Xeda and Runer112.", 0	; Line 3
 	.db	"", 0					; Line 4
 	.db	"", 0					; Line 5
 	.db	"", 0					; Line 6
@@ -86,7 +86,7 @@ klondikeWinDialog:
 	.db	"Score:", 0				; Line 1
 	.db	"High score:", 0			; Line 2
 	.db	"Time:", 0				; Line 3
-	.db	"Time bonus: ", 0			; Line 4
+	.db	"Time bonus:", 0			; Line 4
 	.db	"Games won:", 0				; Line 5
 	.db	"Games forfeit:", 0			; Line 6
 	.db	"", 0					; Line 7
@@ -206,17 +206,17 @@ spJackOfClubs:
  .db px(Yw,Yw,Yw,Bk),px(Wh,Wh,Wh,Wh),px(Wh,Wh,Bk,Bk),px(Bk,Bk,Bk,Bk),px(Bk,Rd,Rd,Rd),px(Rd,Bk,Wh,Wh)
  .db px(Bk,Yw,Bk,Bk),px(Bk,Wh,Wh,Wh),px(Wh,Wh,Bk,Wh),px(Wh,Wh,Wh,Wh),px(Wh,Bk,Bk,Bk),px(Bk,Bk,Wh,Wh)
  .db px(Yw,Yw,Bk,Wh),px(Wh,Wh,Wh,Wh),px(Wh,Bk,Wh,Wh),px(Wh,Wh,Wh,Wh),px(Wh,Wh,Wh,Bk),px(Bk,Bk,Wh,Wh)
- .db px(Bk,Yw,Bk,Wh),px(Wh,Wh,Wh,Wh),px(Wh,Bk,Wh,Wh),px(Wh,Wh,Wh,Wh),px(Wh,Wh,Wh,Yw),px(Yw,Yw,Bk,Wh)
- .db px(Yw,Yw,Bk,Wh),px(Wh,Wh,Wh,Wh),px(Wh,Bk,Bk,Bk),px(Bk,Wh,Bk,Bk),px(Bk,Wh,Wh,Yw),px(Bk,Yw,Yw,Wh)
- .db px(Bk,Yw,Bk,Wh),px(Wh,Bk,Wh,Wh),px(Wh,Bk,Wh,Bk),px(Bk,Wh,Wh,Bk),px(Bk,Wh,Wh,Yw),px(Yw,Yw,Bk,Wh)
- .db px(Yw,Yw,Bk,Wh),px(Bk,Bk,Bk,Wh),px(Wh,Bk,Wh,Wh),px(Wh,Wh,Bk,Wh),px(Wh,Wh,Wh,Yw),px(Bk,Yw,Yw,Wh)
- .db px(Bk,Yw,Wh,Bk),px(Wh,Bk,Wh,Bk),px(Wh,Bk,Wh,Wh),px(Wh,Wh,Bk,Wh),px(Wh,Wh,Wh,Yw),px(Yw,Yw,Bk,Wh)
- .db px(Yw,Yw,Bk,Bk),px(Bk,Bk,Bk,Bk),px(Bk,Bk,Wh,Wh),px(Wh,Bk,Bk,Bk),px(Wh,Wh,Wh,Yw),px(Bk,Yw,Yw,Wh)
- .db px(Bk,Yw,Wh,Bk),px(Wh,Bk,Wh,Bk),px(Wh,Bk,Wh,Wh),px(Wh,Wh,Wh,Wh),px(Wh,Wh,Wh,Yw),px(Yw,Yw,Bk,Wh)
- .db px(Yw,Yw,Wh,Wh),px(Wh,Bk,Wh,Wh),px(Wh,Bk,Wh,Wh),px(Wh,Wh,Wh,Wh),px(Wh,Wh,Wh,Yw),px(Bk,Yw,Yw,Wh)
- .db px(Bk,Yw,Wh,Bk),px(Bk,Bk,Bk,Bk),px(Wh,Bk,Wh,Wh),px(Bk,Bk,Bk,Bk),px(Bk,Wh,Wh,Yw),px(Yw,Yw,Bk,Wh)
- .db px(Yw,Yw,Bk,Wh),px(Wh,Wh,Wh,Wh),px(Wh,Bk,Wh,Wh),px(Wh,Wh,Wh,Wh),px(Wh,Wh,Wh,Yw),px(Bk,Yw,Yw,Wh)
- .db px(Bk,Yw,Bk,Wh),px(Wh,Wh,Wh,Wh),px(Wh,Bk,Bk,Bk),px(Wh,Wh,Wh,Wh),px(Wh,Bk,Bk,Bk),px(Yw,Yw,Bk,Wh)
+ .db px(Bk,Yw,Bk,Wh),px(Wh,Wh,Wh,Wh),px(Wh,Bk,Wh,Wh),px(Wh,Wh,Wh,Wh),px(Wh,Wh,Wh,Yw),px(Yw,Yw,Wh,Wh)
+ .db px(Yw,Yw,Bk,Wh),px(Wh,Wh,Wh,Wh),px(Wh,Bk,Bk,Bk),px(Bk,Wh,Bk,Bk),px(Bk,Wh,Wh,Yw),px(Wh,Yw,Yw,Wh)
+ .db px(Bk,Yw,Bk,Wh),px(Wh,Bk,Wh,Wh),px(Wh,Bk,Wh,Bk),px(Bk,Wh,Wh,Bk),px(Bk,Wh,Wh,Yw),px(Yw,Yw,Wh,Wh)
+ .db px(Yw,Yw,Bk,Wh),px(Bk,Bk,Bk,Wh),px(Wh,Bk,Wh,Wh),px(Wh,Wh,Bk,Wh),px(Wh,Wh,Wh,Yw),px(Wh,Yw,Yw,Wh)
+ .db px(Bk,Yw,Wh,Bk),px(Wh,Bk,Wh,Bk),px(Wh,Bk,Wh,Wh),px(Wh,Wh,Bk,Wh),px(Wh,Wh,Wh,Yw),px(Yw,Yw,Wh,Wh)
+ .db px(Yw,Yw,Bk,Bk),px(Bk,Bk,Bk,Bk),px(Bk,Bk,Wh,Wh),px(Wh,Bk,Bk,Bk),px(Wh,Wh,Wh,Yw),px(Wh,Yw,Yw,Wh)
+ .db px(Bk,Yw,Wh,Bk),px(Wh,Bk,Wh,Bk),px(Wh,Bk,Wh,Wh),px(Wh,Wh,Wh,Wh),px(Wh,Wh,Wh,Yw),px(Yw,Yw,Wh,Wh)
+ .db px(Yw,Yw,Wh,Wh),px(Wh,Bk,Wh,Wh),px(Wh,Bk,Wh,Wh),px(Wh,Wh,Wh,Wh),px(Wh,Wh,Wh,Yw),px(Wh,Yw,Yw,Wh)
+ .db px(Bk,Yw,Wh,Bk),px(Bk,Bk,Bk,Bk),px(Wh,Bk,Wh,Wh),px(Bk,Bk,Bk,Bk),px(Bk,Wh,Wh,Yw),px(Yw,Yw,Wh,Wh)
+ .db px(Yw,Yw,Bk,Wh),px(Wh,Wh,Wh,Wh),px(Wh,Bk,Wh,Wh),px(Wh,Wh,Wh,Wh),px(Wh,Wh,Wh,Yw),px(Wh,Yw,Yw,Wh)
+ .db px(Bk,Yw,Bk,Wh),px(Wh,Wh,Wh,Wh),px(Wh,Bk,Bk,Bk),px(Wh,Wh,Wh,Wh),px(Wh,Bk,Bk,Bk),px(Yw,Yw,Wh,Wh)
  .db px(Yw,Yw,Bk,Wh),px(Wh,Wh,Wh,Wh),px(Bk,Wh,Bk,Rd),px(Bk,Bk,Bk,Bk),px(Bk,Rd,Bk,Wh),px(Bk,Yw,Yw,Wh)
  .db px(Bk,Yw,Bk,Wh),px(Wh,Wh,Wh,Bk),px(Rd,Rd,Wh,Bk),px(Rd,Rd,Rd,Rd),px(Rd,Bk,Wh,Rd),px(Rd,Bk,Yw,Wh)
  .db px(Yw,Yw,Bk,Wh),px(Wh,Wh,Bk,Rd),px(Yw,Rd,Rd,Wh),px(Bk,Rd,Rd,Rd),px(Bk,Wh,Rd,Rd),px(Yw,Bk,Bk,Wh)
@@ -259,22 +259,22 @@ spJackOfHearts:
  .db px(Wh,Bk,Rd,Rd),px(Rd,Rd,Rd,Rd),px(Rd,Rd,Rd,Rd),px(Rd,Rd,Bk,Wh),px(Wh,Wh,Wh,Wh),px(Wh,Wh,Wh,Wh)
  .db px(Wh,Wh,Bk,Rd),px(Rd,Rd,Rd,Rd),px(Bk,Bk,Bk,Bk),px(Bk,Bk,Wh,Wh),px(Wh,Wh,Rd,Wh),px(Rd,Wh,Wh,Wh)
  .db px(Wh,Wh,Bk,Bk),px(Bk,Bk,Bk,Bk),px(Wh,Wh,Wh,Wh),px(Wh,Bk,Wh,Wh),px(Wh,Rd,Rd,Rd),px(Rd,Rd,Wh,Wh)
- .db px(Wh,Bk,Yw,Yw),px(Yw,Bk,Wh,Wh),px(Wh,Wh,Wh,Wh),px(Wh,Wh,Bk,Wh),px(Wh,Rd,Rd,Rd),px(Rd,Rd,Wh,Wh)
- .db px(Wh,Yw,Yw,Bk),px(Yw,Wh,Wh,Wh),px(Wh,Wh,Wh,Bk),px(Bk,Wh,Bk,Wh),px(Wh,Wh,Rd,Rd),px(Rd,Wh,Wh,Wh)
- .db px(Wh,Bk,Yw,Yw),px(Yw,Wh,Bk,Wh),px(Wh,Wh,Wh,Bk),px(Bk,Wh,Bk,Wh),px(Wh,Wh,Wh,Rd),px(Wh,Wh,Wh,Wh)
- .db px(Wh,Yw,Yw,Bk),px(Yw,Bk,Wh,Bk),px(Wh,Wh,Wh,Wh),px(Wh,Wh,Bk,Wh),px(Wh,Wh,Wh,Wh),px(Wh,Wh,Wh,Wh)
- .db px(Wh,Bk,Yw,Yw),px(Yw,Bk,Wh,Wh),px(Wh,Wh,Wh,Wh),px(Wh,Wh,Bk,Bk),px(Wh,Wh,Wh,Wh),px(Wh,Wh,Wh,Wh)
- .db px(Wh,Yw,Yw,Bk),px(Yw,Wh,Bk,Wh),px(Wh,Wh,Bk,Bk),px(Wh,Wh,Bk,Bk),px(Wh,Wh,Yw,Bk),px(Bk,Wh,Bk,Wh)
- .db px(Wh,Bk,Yw,Yw),px(Yw,Wh,Wh,Wh),px(Wh,Wh,Wh,Wh),px(Wh,Wh,Bk,Wh),px(Wh,Bk,Yw,Yw),px(Bk,Wh,Bk,Wh)
- .db px(Wh,Yw,Yw,Bk),px(Yw,Wh,Bk,Wh),px(Bk,Wh,Wh,Wh),px(Wh,Wh,Bk,Wh),px(Wh,Bk,Yw,Yw),px(Bk,Bk,Bk,Wh)
- .db px(Wh,Bk,Yw,Yw),px(Yw,Wh,Wh,Wh),px(Wh,Wh,Wh,Bk),px(Bk,Bk,Bk,Wh),px(Wh,Bk,Yw,Yw),px(Bk,Bk,Bk,Wh)
- .db px(Wh,Yw,Yw,Bk),px(Yw,Bk,Wh,Bk),px(Wh,Bk,Wh,Wh),px(Wh,Bk,Wh,Wh),px(Wh,Bk,Yw,Yw),px(Bk,Wh,Bk,Wh)
- .db px(Yw,Bk,Yw,Yw),px(Yw,Wh,Wh,Wh),px(Wh,Wh,Wh,Wh),px(Wh,Bk,Wh,Wh),px(Wh,Wh,Yw,Bk),px(Bk,Wh,Bk,Wh)
- .db px(Yw,Yw,Yw,Bk),px(Yw,Wh,Bk,Wh),px(Bk,Wh,Bk,Wh),px(Bk,Wh,Wh,Wh),px(Wh,Wh,Wh,Wh),px(Wh,Wh,Bk,Wh)
- .db px(Yw,Bk,Yw,Yw),px(Yw,Wh,Wh,Wh),px(Wh,Wh,Wh,Bk),px(Bk,Bk,Bk,Wh),px(Wh,Wh,Wh,Wh),px(Wh,Wh,Bk,Wh)
- .db px(Yw,Yw,Yw,Bk),px(Yw,Bk,Bk,Bk),px(Bk,Bk,Bk,Yw),px(Rd,Rd,Wh,Bk),px(Wh,Wh,Wh,Wh),px(Wh,Wh,Bk,Wh)
- .db px(Yw,Bk,Yw,Yw),px(Yw,Rd,Rd,Rd),px(Rd,Rd,Rd,Bk),px(Yw,Rd,Rd,Wh),px(Bk,Wh,Wh,Wh),px(Wh,Wh,Bk,Wh)
- .db px(Yw,Yw,Yw,Bk),px(Yw,Rd,Yw,Rd),px(Yw,Rd,Yw,Rd),px(Bk,Yw,Rd,Rd),px(Wh,Bk,Wh,Wh),px(Wh,Wh,Bk,Wh)
+ .db px(Wh,Wh,Yw,Yw),px(Yw,Bk,Wh,Wh),px(Wh,Wh,Wh,Wh),px(Wh,Wh,Bk,Wh),px(Wh,Rd,Rd,Rd),px(Rd,Rd,Wh,Wh)
+ .db px(Wh,Yw,Yw,Wh),px(Yw,Wh,Wh,Wh),px(Wh,Wh,Wh,Bk),px(Bk,Wh,Bk,Wh),px(Wh,Wh,Rd,Rd),px(Rd,Wh,Wh,Wh)
+ .db px(Wh,Wh,Yw,Yw),px(Yw,Wh,Bk,Wh),px(Wh,Wh,Wh,Bk),px(Bk,Wh,Bk,Wh),px(Wh,Wh,Wh,Rd),px(Wh,Wh,Wh,Wh)
+ .db px(Wh,Yw,Yw,Wh),px(Yw,Bk,Wh,Bk),px(Wh,Wh,Wh,Wh),px(Wh,Wh,Bk,Wh),px(Wh,Wh,Wh,Wh),px(Wh,Wh,Wh,Wh)
+ .db px(Wh,Wh,Yw,Yw),px(Yw,Bk,Wh,Wh),px(Wh,Wh,Wh,Wh),px(Wh,Wh,Bk,Bk),px(Wh,Wh,Wh,Wh),px(Wh,Wh,Wh,Wh)
+ .db px(Wh,Yw,Yw,Wh),px(Yw,Wh,Bk,Wh),px(Wh,Wh,Wh,Wh),px(Wh,Wh,Bk,Bk),px(Wh,Wh,Yw,Bk),px(Bk,Wh,Bk,Wh)
+ .db px(Wh,Wh,Yw,Yw),px(Yw,Wh,Wh,Wh),px(Wh,Wh,Wh,Wh),px(Wh,Wh,Bk,Wh),px(Wh,Bk,Yw,Yw),px(Bk,Wh,Bk,Wh)
+ .db px(Wh,Yw,Yw,Wh),px(Yw,Wh,Bk,Wh),px(Bk,Wh,Wh,Wh),px(Wh,Wh,Bk,Wh),px(Wh,Bk,Yw,Yw),px(Bk,Bk,Bk,Wh)
+ .db px(Wh,Wh,Yw,Yw),px(Yw,Wh,Wh,Wh),px(Wh,Wh,Wh,Bk),px(Bk,Bk,Bk,Wh),px(Wh,Bk,Yw,Yw),px(Bk,Bk,Bk,Wh)
+ .db px(Wh,Yw,Yw,Wh),px(Yw,Bk,Wh,Bk),px(Wh,Bk,Wh,Wh),px(Wh,Bk,Wh,Wh),px(Wh,Bk,Yw,Yw),px(Bk,Wh,Bk,Wh)
+ .db px(Yw,Wh,Yw,Yw),px(Yw,Wh,Wh,Wh),px(Wh,Wh,Wh,Wh),px(Wh,Bk,Wh,Wh),px(Wh,Wh,Yw,Bk),px(Bk,Wh,Bk,Wh)
+ .db px(Yw,Yw,Yw,Wh),px(Yw,Wh,Bk,Wh),px(Bk,Wh,Bk,Wh),px(Bk,Wh,Wh,Wh),px(Wh,Wh,Wh,Wh),px(Wh,Wh,Bk,Wh)
+ .db px(Yw,Wh,Yw,Yw),px(Yw,Wh,Wh,Wh),px(Wh,Wh,Wh,Bk),px(Bk,Bk,Bk,Wh),px(Wh,Wh,Wh,Wh),px(Wh,Wh,Bk,Wh)
+ .db px(Yw,Yw,Yw,Wh),px(Yw,Bk,Bk,Bk),px(Bk,Bk,Bk,Yw),px(Rd,Rd,Wh,Bk),px(Wh,Wh,Wh,Wh),px(Wh,Wh,Bk,Wh)
+ .db px(Yw,Wh,Yw,Yw),px(Yw,Rd,Rd,Rd),px(Rd,Rd,Rd,Bk),px(Yw,Rd,Rd,Wh),px(Bk,Wh,Wh,Wh),px(Wh,Wh,Bk,Wh)
+ .db px(Yw,Yw,Yw,Wh),px(Yw,Rd,Yw,Rd),px(Yw,Rd,Yw,Rd),px(Bk,Yw,Rd,Rd),px(Wh,Bk,Wh,Wh),px(Wh,Wh,Bk,Wh)
  .db px(Yw,Yw,Yw,Rd),px(Rd,Rd,Yw,Rd),px(Yw,Rd,Yw,Rd),px(Yw,Bk,Yw,Rd),px(Rd,Wh,Bk,Wh),px(Wh,Wh,Bk,Wh)
  .db px(Rd,Rd,Rd,Rd),px(Rd,Bk,Bk,Bk),px(Bk,Bk,Bk,Bk),px(Rd,Rd,Bk,Yw),px(Rd,Rd,Wh,Bk),px(Wh,Wh,Bk,Wh)
  .db px(Rd,Yw,Bk,Rd),px(Bk,Yw,Bk,Yw),px(Bk,Yw,Bk,Yw),px(Bk,Rd,Yw,Bk),px(Yw,Rd,Rd,Bk),px(Wh,Wh,Bk,Wh)

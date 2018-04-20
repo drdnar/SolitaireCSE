@@ -180,7 +180,7 @@ _dialogBanner:
 	.db	14			; Height
 	.dw	GuiDrawFilledBox	; Draw callback
 _dialogButton1:
-	.dw	_dialogButton2	; Pointer to next entry
+	.dw	_dialogButton2		; Pointer to next entry
 	.db	guiButton		; Flags & Type ID
 	.dw	144			; Column
 	.db	164			; Row

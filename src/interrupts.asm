@@ -53,11 +53,11 @@ SetUpInterrupts:
 	out	(pCrstlTmr3Freq), a
 	out	(pLnkAstSeEnable), a
 	; And kill USB
-;	out	(57h), a
-;	out	(5Bh), a
-;	out	(4Ch), a
-;	ld	a, 2
-;	out	(54h), a
+	out	(57h), a
+	out	(5Bh), a
+	out	(4Ch), a
+	ld	a, 2
+	out	(54h), a
 	; RAM-Resident Routines
 	ld	hl, ScanKeyboardSource
 	ld	de, ScanKeyboard
@@ -76,8 +76,8 @@ SetUpInterrupts:
 	ld	bc, FixPageEnd - FixPageSource
 	ldir
 	; Custom interrupt vector table
-	ld	hl, IvtLocation*256
-	ld	de, IvtLocation*256+1
+	ld	hl, IvtLocation * 256
+	ld	de, IvtLocation * 256 + 1
 	ld	bc, 256
 	ld	a, IvtLocation
 	ld	i, a
@@ -86,7 +86,7 @@ SetUpInterrupts:
 	ldir
 	; ISR
 	ld	hl, InterruptServiceRoutine
-	ld	de, IsrLocation*256+IsrLocation
+	ld	de, IsrLocation * 256 + IsrLocation
 	ld	bc, 3
 	ldir
 	; Enable only wanted interrupts
@@ -97,6 +97,7 @@ SetUpInterrupts:
 	out	(pIntMask), a
 	im	2
 	ret
+
 InterruptServiceRoutine:
 	jp	RealIsr
 

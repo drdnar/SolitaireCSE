@@ -216,72 +216,6 @@ DrawRect:
 	ret
 
 
-;------ DrawOutlinedFilledRect -------------------------------------------------
-DrawOutlinedFilledRect:
-; Draws a rectangle with a black outline and filled interior.
-; Inputs:
-;  - HL: Left side
-;  - D: Top
-;  - E: Height
-;  - C: Fill color
-;  - B: Width
-	push	ix
-	ld	ix, 0
-	add	ix, sp
-	push	hl	; ix - 1, ix - 2
-	push	de	; ix - 3, ix - 4
-	push	bc	; ix - 5, ix - 6
-	; Fill
-	inc	hl
-	inc	d
-	dec	e
-	dec	e
-	dec	b
-	dec	b
-	call	DrawFilledRect
-	; Top line
-	ld	l, (ix - 2)
-	ld	h, (ix - 1)
-	ld	d, (ix - 3)
-	ld	b, (ix - 5)
-	ld	c, colorBlack
-	call	DrawHorizLine
-	; Bottom line
-	ld	a, (ix - 3)
-	add	a, (ix - 4)
-	dec	a
-	ld	d, a
-	ld	b, (ix - 5)
-	call	DrawHorizLine
-	; Left line
-	ld	d, (ix - 3)
-	inc	d
-	ld	b, (ix - 4)
-	dec	b
-	dec	b
-	call	DrawVertLine
-	; Right line
-	ld	l, (ix - 2)
-	ld	h, (ix - 1)
-	ld	a, (ix - 5)
-	dec	a
-	add	a, l
-	jr	nc, $ + 3
-	inc	h
-	ld	l, a
-	ld	d, (ix - 3)
-	inc	d
-	ld	b, (ix - 4)
-	dec	b
-	dec	b
-	call	DrawVertLine
-	pop	bc
-	pop	de
-	pop	hl
-	pop	ix
-	ret
-
-
 ;------ InvertRect -------------------------------------------------------------
 InvertRect:
 ; Inverts the colors in a given region.
@@ -359,6 +293,31 @@ _invl:
 	jr	nz, _invol
 	ei
 	ret
+
+
+;------ DrawOutlinedFilledRect -------------------------------------------------
+DrawOutlinedFilledRect:
+; Draws a rectangle with a black outline and filled interior.
+; Inputs:
+;  - HL: Left side
+;  - D: Top
+;  - E: Height
+;  - C: Fill color
+;  - B: Width
+	push	hl
+	push	de
+	push	bc
+	call	DrawRect
+	pop	bc
+	pop	de
+	pop	hl
+	; Fill
+	inc	hl
+	inc	d
+	dec	e
+	dec	e
+	dec	b
+	dec	b
 
 
 ;------ DrawFilledRect ---------------------------------------------------------

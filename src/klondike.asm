@@ -230,7 +230,7 @@ KlondikeForfeit:
 	ld	hl, (kdGamesQuit)
 	inc	hl
 	bit	7, h
-	jr	nz, {@}
+	jr	nz, {@}	; Saves one byte
 	ld	(kdGamesQuit), hl
 @:	jp	MainMenu
 

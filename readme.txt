@@ -2,7 +2,7 @@
 
 
                                    Solitaire
-                                  9 May 2014
+                                13 November 2014
 
 
 
@@ -32,10 +32,10 @@ delete both the app named Solitair and the appvar named Solitair.
 
 MAIN MENU
 
-    Solitaire has a main menu which lets you select which game to play, and the
-options applicable for the chosen game.  The currently selected menu item is
-displayed in inverted color; that is, white text on black background.  The arrow
-keys will select different items.  Press ENTER or 2ND to select an item.
+    Solitaire's main menu lets you select which game to play, and the options
+applicable for the chosen game.  The currently selected menu item is displayed in
+inverted color; that is, white text on black background.  The arrow keys will
+select different items.  Press ENTER or 2ND to select an item.
 
     To quit, you must press the quit button at the bottom of the screen.
     
@@ -237,6 +237,19 @@ FreeCell for me.
 
 ------ Change Log --------------------------------------------------------------
 
+Build 1050 (13 November 2014)
+ - Fixed stack overflow issue that would happen if you played more than 200ish
+   games without exiting the app
+ - Prevented a potential issue where unknown behavior could occur if a
+   GarbageCollect or error occurred during saving
+ - Fixed bug where saving a FreeCell game would not re-archive the appvar
+   (Why did this happen?  The above change also fixed this for some reason.)
+ - Plugging in a USB cable no longer causes an abort
+ - Optimized some code for size
+ - 238 free bytes remaining
+ - Unless new bugs are discovered or somebody has a better idea for the face
+   card graphics, this is the last update.
+
 Build 1000 (9 May 2014)
  - Fixed supermove free cell count; now each free tableau slot doubles count as
    it should
@@ -244,8 +257,7 @@ Build 1000 (9 May 2014)
  - If the appvar is archived when you start Solitaire, it will be archived when
    you quit.
  - Finally added face card graphics
- - Unless new bugs are discovered or somebody has a better idea for the face
-   card graphics, this is the last update.
+ - 152 free bytes remaining
 
 Build 956 (21 April 2014)
  - Optimized more

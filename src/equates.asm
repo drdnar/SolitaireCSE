@@ -410,7 +410,7 @@ charWidth = 10
 ;------ Settings ---------------------------------------------------------------
 ; Timers
 ; Sets how many half-seconds elapse until APD
-suspendDelay	.equ	2*60*3
+suspendDelay	.equ	2 * 60 * 3
 ; Sets the frequency at which the keyboard is scanned
 kbdScanDivisor		.equ	10	; The below values are multiples of 10.24 ms
 ; A key must be held this long to be accepted
@@ -428,6 +428,8 @@ cursorPeriod		.equ	200h
 ;------ Flags ------------------------------------------------------------------
 ; These are used by the text input routines
 saveVarFlags		.equ	asm_Flag1
+updateSaveVar		.equ	0
+updateSaveVarM		.equ	1
 rearchiveSaveVar	.equ	1
 rearchiveSaveVarM	.equ	2
 mKbdFlags		.equ	asm_Flag1

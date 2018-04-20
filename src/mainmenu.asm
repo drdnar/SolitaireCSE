@@ -7,6 +7,7 @@
 .module	MainMenu
 ;====== Main Menu ==============================================================
 StartGame:
+	pop	af
 	ld	hl, stacks
 	ld	(hl), 255
 	ld	de, stacks + 1

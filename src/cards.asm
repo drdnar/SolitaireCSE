@@ -144,14 +144,13 @@ _lslp:	ex	de, hl
 	jr	z, {@}
 	and	stackCountM
 	jr	z, {@}
-	cp	24
-	call	nc, Panic
+;	cp	24
+;	call	nc, Panic
 	ex	de, hl
 	ld	bc, 7
 	add	hl, bc
 	ex	de, hl
 	ld	c, a
-	ld	b, 0
 	ldir
 @:	inc	ixl
 	ld	a, ixl
@@ -690,9 +689,11 @@ DrawStacks:
 	inc	ix
 @:	push	bc
 	ld	a, (ix)
-	inc	ix
-	inc	ix
-	inc	ix
+;	inc	ix
+;	inc	ix
+;	inc	ix
+	ld	de, 3
+	add	ix, de
 	ld	l, a
 	call	DerefStack
 	ld	a, (hl)
@@ -1355,6 +1356,130 @@ EraseBelowStack:
 	jp	DrawFilledRect
 
 
+;.ifdef	NEVER
+;------ DrawStack --------------------------------------------------------------
+DrawStack:
+; Draws a complete stack.
+; Input:
+;  - A: Stack number
+; Output:
+;  - Stack drawn
+; Destroys:
+;  - AF
+;  - BC
+;  - DE
+;  - HL
+	push	ix
+	ld	ix, 0
+	add	ix, sp
+	push	af	; ix - 1, ix - 2
+	push	af	; ix - 3, ix - 4
+	ld	l, a
+	call	DerefStack
+	ld	a, (hl)
+	and	stackCountM
+	jr	nz, {@}
+	; Stack is empty; draw placeholder box instead
+	inc	hl
+	ld	e, (hl)
+	inc	hl
+	ld	d, (hl)
+	inc	hl
+	ld	a, (hl)
+	ex	de, hl
+	ld	d, a
+	ld	e, cardHeight
+	ld	b, cardWidth
+	ld	c, colorGreen
+	call	DrawOutlinedFilledRect
+	jr	_dsret
+@:	; Show only top card if required
+	bit	stackShowOnlyTop, (hl)
+	jr	z, {@}
+	ld	l, (ix - 1)
+	call	CheckCard
+	push	af
+	ld	l, (ix - 1)
+	xor	a
+	call	GetCardLocation
+	ld	e, d
+	pop	af
+	and	3Fh
+	ld	d, a
+	call	DrawCardFull
+_dsret:	pop	af
+	pop	af
+	pop	ix
+	ret
+@:	; Draw regular stack
+	ld	a, (hl)
+	and	stackCountM
+	ld	(ix - 2), a
+	ld	(ix - 3), 0
+	ld	de, 8
+	add	hl, de
+	; Is card visible?
+_dsloop:
+	ld	a, (hl)
+	inc	hl
+	bit	cardNotVisible, a
+	jr	z, _dsvis
+	; Nope
+	push	hl
+	ld	a, (ix - 3)
+	ld	l, (ix - 1)
+	call	GetCardLocation
+	ld	e, d
+	ld	a, (ix - 2)
+	dec	a
+	jr	nz, {@}
+	pop	af
+	call	Locate
+	di
+	ld	a, lrWinBottom
+	out	(pLcdCmd), a
+	out	(pLcdCmd), a
+	xor	a
+	out	(pLcdData), a
+	ld	a, (lcdRow)
+	add	a, 38
+	out	(pLcdData), a
+	ei	
+	ld	a, chBackGraphic
+	call	PutC
+	jr	_dsRet
+@:	call	DrawHiddenCardHeader
+	pop	hl
+_dslt:	dec	(ix - 2)
+	jr	z, _dsRet
+	inc	(ix - 3)
+	jr	_dsloop
+_dsvis:	; Card is visible
+	; Is card on top?
+	push	hl
+	ld	b, a
+	ld	a, (ix - 2)
+	cp	1
+	push	af
+	ld	a, (ix - 3)
+	ld	l, (ix - 1)
+	push	bc
+	call	GetCardLocation
+	ld	e, d
+	pop	bc
+	pop	af
+	ld	d, b
+	jr	nz, {@}
+	call	DrawCardFull
+	pop	hl
+	jr	_dsret
+@:	call	DrawCardHeader
+	pop	hl
+	jr	_dslt
+;.endif
+
+
+.ifdef	NEVER
 ;------ DrawStack --------------------------------------------------------------
 DrawStack:
 ; Draws a complete stack.
@@ -1371,21 +1496,22 @@ DrawStack:
 	ld	ix, 0
 	add	ix, sp
 	; Get location of stack from stack number
-	add	a, a
-	ld	hl, stacksTable
-	add	a, l
-	jr	nc, $ + 3
-	inc	h
 	ld	l, a
-	ld	a, (hl)
-	inc	hl
-	ld	h, (hl)
-	ld	l, a
+	call	DerefStack
+;	add	a, a
+;	ld	hl, stacksTable
+;	add	a, l
+;	jr	nc, $ + 3
+;	inc	h
+;	ld	l, a
+;	ld	a, (hl)
+;	inc	hl
+;	ld	h, (hl)
+;	ld	l, a
 	; Process stack header
 	push	af	; ix - 1, ix - 2
 	ld	a, (hl)
 	and	stackCountM
-	or	a
 ;	jr	z, _dsext	; Stack is empty, so nothing to draw
 	jp	z, _dsempt	; Stack is empty, so nothing to draw
 	ld	(ix - 2), a	; => Number of cards left to process
@@ -1510,6 +1636,7 @@ _dsempt: ; Stack is empty; draw a placeholder box instead.
 	ld	c, colorGreen
 	call	DrawOutlinedFilledRect
 	jr	_dsext
+.endif
 
 
 ;------ DrawCardFull -----------------------------------------------------------
