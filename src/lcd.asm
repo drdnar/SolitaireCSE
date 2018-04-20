@@ -4,28 +4,34 @@
 ; To Public License, Version 2, as published by Sam Hocevar. See
 ; http://sam.zoy.org/wtfpl/COPYING for more details.
 
+; This contains LCD routines not related to text.
 
 .module	Lcd
 ;------ DrawFourColorSprite ----------------------------------------------------
 DrawFourColorSprite:
+; Draws a four-color 24x25 sprite.  This is designed only for drawing card body
+; graphics; you'll need to modify it a lot to support arbitrary widths and
+; heights.
 ; Inputs:
 ;  - HL: Left side
 ;  - D: Top
 ;  - BC: Pointer to data
+; Output:
+;  - Sprite drawn
+; Destroys:
+;  - AF
+;  - BC
+;  - DE
+;  - HL
+;  - IX
+;  - BC'
+;  - DE'
+;  - HL'
 ; struct sprite
 ; {
-;	byte width;
-;	byte height;
 ;	word palettePtr;
 ;	byte data[];
 ; }
-; Set cursor direction left-to-right
-; Set left/right window bounds
-; Set top/bottom window bounds
-; Set cursor location
-; Check if sprite crosses bottom of screen, if use, compute number of rows to
-;  draw
-; Use sprite width * number of rows to compute total number of bytes +to write
 	push	ix
 	ld	ix, 0
 	add	ix, sp
@@ -35,34 +41,25 @@ DrawFourColorSprite:
 ; Set cursor direction
 	call	SetDirectionRight
 ; Set left window bound
-	pop	hl
-	push	de
 	di
 	ld	a, lrWinLeft
 	out	(pLcdCmd), a
 	out	(pLcdCmd), a
-	ld	a, d
+	ld	a, h
 	out	(pLcdData), a
-	ld	a, e
+	ld	a, l
 	out	(pLcdData), a
 ; Set initial cursor column
 	ld	a, lrCol
 	out	(pLcdCmd), a
 	out	(pLcdCmd), a
-	ld	a, d
+	ld	a, h
 	out	(pLcdData), a
-	ld	a, e
+	ld	a, l
 	out	(pLcdData), a
 ; Set right window bound
-	ld	l, (ix - 2)
-	ld	h, (ix - 1)
-	ld	a, (hl)
-	dec	a
-	ex	de, hl
-	add	a, l
-	jr	nc, $ + 3
-	inc	h
-	ld	l, a
+	ld	de, 23
+	add	hl, de
 	ld	a, lrWinRight
 	out	(pLcdCmd), a
 	out	(pLcdCmd), a
@@ -79,14 +76,6 @@ DrawFourColorSprite:
 	ld	b, (ix - 3)
 	ld	a, b
 	out	(pLcdData), a
-; Set bottom window bound
-	ld	a, lrWinBottom
-	out	(pLcdCmd), a
-	out	(pLcdCmd), a
-	xor	a
-	out	(pLcdData), a
-	ld	a, colorScrnHeight - 1
-	out	(pLcdData), a
 ; Set initial cursor row
 	ld	a, lrRow
 	out	(pLcdCmd), a
@@ -95,33 +84,26 @@ DrawFourColorSprite:
 	out	(pLcdData), a
 	ld	a, b
 	out	(pLcdData), a
+; Set bottom window bound
+	ld	a, lrWinBottom
+	out	(pLcdCmd), a
+	out	(pLcdCmd), a
+	xor	a
+	out	(pLcdData), a
+	ld	a, colorScrnHeight - 1
+	out	(pLcdData), a
+; Prepare for data
+	ld	a, lrGram
+	out	(pLcdCmd), a
+	out	(pLcdCmd), a
 	ei
 ; Figure out how many rows to write
-	ld	l, (ix - 2)
-	ld	h, (ix - 1)
-	inc	hl
-	ld	a, (hl)
-	ld	(ix - 4), a
-	; It turns out this logic isn't needed because face cards can never be at the bottom
-;	ld	b, (ix - 3)
-;	add	a, b
-;	sub	colorScrnHeight
-;	jr	c, {@}
-;	ld	b, (ix - 3)
-;	add	a, b
-;	ld	(ix - 4), a	; IX - 4: Row counter
+	ld	(ix - 4), 25
 @:	; Figure out how many bytes to write per row
 	ld	l, (ix - 2)
 	ld	h, (ix - 1)
-	ld	a, (hl)
-;	add	a, 3	; Uncomment if output loop adds support for arbitrary widths
-;	and	0FCh	; This will currently go haywire if you specify a width not mod 4
-	rra
-	rra
-	ld	(ix - 3), a	; IX - 3: Bytes to write per row
+	ld	(ix - 3), 6	; IX - 3: Bytes to write per row
 ; Fetch pointer to palette
-	inc	hl
-	inc	hl
 	push	hl
 	exx
 	pop	hl
@@ -165,6 +147,7 @@ _4colorRowLoop:
 	; Loop control
 	djnz	{-1@}
 	dec	d
+	inc	hl
 	jr	nz, _4colorRowLoop
 	dec	(ix - 4)
 	ei
@@ -364,7 +347,7 @@ _invl:
 	in	a, (pLcdData)
 	in	a, (pLcdData)
 	; Set pixel
-	xor	255
+	cpl
 	out	(pLcdData), a
 	out	(pLcdData), a
 	djnz	_invl

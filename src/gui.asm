@@ -17,8 +17,14 @@ guiNumberBox		.equ	3 + guiFlagInteractive
 ShowNumbers:
 ; Shows a table of numbers
 ; Input:
-;  - IX: Pointer to struct
-; 
+;  - IX: Pointer to struct, first byte length, followed by pointers to 16-bit signed ints
+; Output:
+;  - Number drawn
+; Destroys:
+;  - AF
+;  - BC
+;  - DE
+;  - HL
 	ld	b, (ix)
 	inc	ix
 @:	ld	l, (ix + 0)
@@ -42,7 +48,7 @@ ShowNumbers:
 
 ;------ ShowModalDialog --------------------------------------------------------
 ShowModalDialog:
-; Shows a message box with two buttons.
+; Shows a message box with two buttons.  This is a jump, not a call.
 ; Input:
 ;  - IX: Pointer to dialog struct.
 ; Output:
@@ -65,7 +71,6 @@ ShowModalDialog:
 ;	.db	Line 8, 0
 ;	.db	Button 1 text, 0
 ;	.db	Button 2 text, 0
-
 	; Draw boxes
 	push	ix
 		ld	ix, _dialog
@@ -451,6 +456,7 @@ _garex:	ld	iy, flags
 
 ;------ ------------------------------------------------------------------------
 GuiActionNumberBox:
+; This routine does not support negative numbers.
 	ld	l, (ix + 20)
 	ld	h, (ix + 21)
 	ld	a, (hl)

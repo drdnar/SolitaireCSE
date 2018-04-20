@@ -4,8 +4,9 @@
 ; To Public License, Version 2, as published by Sam Hocevar. See
 ; http://sam.zoy.org/wtfpl/COPYING for more details.
 
-.module	Interrupts
+; This is the interrupt driver.
 
+.module	Interrupts
 
 ;------ ApdOn ------------------------------------------------------------------
 ;ApdOn:
@@ -57,21 +58,37 @@ SetUpInterrupts:
 ;	out	(4Ch), a
 ;	ld	a, 2
 ;	out	(54h), a
-	; Custom Interrupts
-;	ld	hl, IvtLocation*256
-;	ld	de, IvtLocation*256+1
-;	ld	bc, 256
-;	ld	a, IvtLocation
-;	ld	i, a
-;	ld	a, IsrLocation
-;	ld	(hl), a
-;	ldir
-;	ld	hl, InterruptServiceRoutine
-;	ld	de, IsrLocation*256+IsrLocation
-;	ld	bc, 3
-;	ldir
-	ld	a, InterruptVectorTable / 256
+	; RAM-Resident Routines
+	ld	hl, ScanKeyboardSource
+	ld	de, ScanKeyboard
+	ld	bc, ScanKeyboardEnd - ScanKeyboardSource
+	ldir
+	ld	hl, RawGetCSCSource
+	ld	de, RawGetCSC
+	ld	bc, RawGetCSCEnd - RawGetCSCSource
+	ldir
+	ld	hl, RealIsrSource
+	ld	de, RealIsr
+	ld	bc, RealIsrEnd - RealIsrSource
+	ldir
+	ld	hl, FixPageSource
+	ld	de, FixPage
+	ld	bc, FixPageEnd - FixPageSource
+	ldir
+	; Custom interrupt vector table
+	ld	hl, IvtLocation*256
+	ld	de, IvtLocation*256+1
+	ld	bc, 256
+	ld	a, IvtLocation
 	ld	i, a
+	ld	a, IsrLocation
+	ld	(hl), a
+	ldir
+	; ISR
+	ld	hl, InterruptServiceRoutine
+	ld	de, IsrLocation*256+IsrLocation
+	ld	bc, 3
+	ldir
 	; Enable only wanted interrupts
 	;ld	a, tmrFreq0 | memMapMode0 | battVoltage0
 	xor	a	; Above expression evaulates to 0
@@ -80,22 +97,22 @@ SetUpInterrupts:
 	out	(pIntMask), a
 	im	2
 	ret
-;InterruptServiceRoutine:
-;	jp	RealIsr
+InterruptServiceRoutine:
+	jp	RealIsr
 
 
 ;------ Interrupt Service Routine ----------------------------------------------
 ;	.dw	RealIsrEnd - RealIsrSource
-;RealIsrSource:
-RealIsr:
+RealIsrSource:
+;RealIsr:
 	; PC valid check
 	ex	(sp), hl
 	push	af
 	ld	a, h
 	cp	80h
-	call	nc, Panic
+	jr	nc, _isrQuit
 	cp	40h
-	call	c, Panic
+	jr	c, _isrQuit
 	pop	af
 	ex	(sp), hl
 	
@@ -113,25 +130,25 @@ RealIsr:
 	ld	iy, 0
 	add	iy, sp
 	ld	sp, 0FFF0h
-	call	Panic
+	jp	_isrQuit
 @:	; Check interrupt source
 	in	a, (pIntId)
 	rra
-;	jp	c, InstantQuit;intHOnKey
 	jr	nc, {@}
 	; On key
 	ld	a, intOnKey ^ 255
 	out	(pIntAck), a
+	call	FixPage
 	pop	hl
 	pop	af
 	jp	Panic
 @:	rra
-	jp	c, Quit	;call	c, Panic;	jp	c, InstantQuit
+	jr	c, _isrQuit
 	rra
 	jr	c, _intHPapd
 	rra
 	rra
-	jp	c, Quit	;call	c, Panic;	jp	c, InstantQuit
+	jr	c, _isrQuit
 ;	rra
 ;	jr	c, intHCrystal
 ;	rra
@@ -143,8 +160,10 @@ RealIsr:
 ;intHLink:
 ;intHCrystal:
 ;intHApd: ; WTF, didn't we disable this interrupt?
-	jp	Quit	;call	Panic;	jp	InstantQuit
-
+;	jp	InstantQuit
+_isrQuit:
+	call	FixPage
+	jp	Quit
 _intHPapd:
 ;	push	hl
 	; ACK the interrupt
@@ -188,8 +207,8 @@ _i2:	; Check the cursor timer.  This timer is always running.
 	bit	setApdNow, a
 	set	setApdNow, a
 	ld	(flags + mSettings), a
-;	jp	nz, InstantQuit
-	jp	nz, Quit	;	call	nz, Panic
+	jr	nz, _isrQuit
+;	jp	nz, Quit	;	call	nz, Panic
 _i3:	; Check if it's time to scan the keyboard
 	ld	a, (kbdScanTimer)
 	dec	a
@@ -204,19 +223,18 @@ _noscn:	pop	hl
 	pop	af
 	ei
 	ret
-;RealIsrEnd:
+RealIsrEnd:
 
 
-;------ InstantQuit ------------------------------------------------------------
-;	.dw	InstantQuitEnd - InstantQuitSource
-;InstantQuitSource:
-;	ld	hl, (mBasePage)
-;	ld	a, h
-;	out	(pMPgAHigh), a
-;	ld	a, l
-;	out	(pMPgA), a
-;	jp	Quit
-;InstantQuitEnd:
+;------ FixPage ----------------------------------------------------------------
+FixPageSource:
+	ld	hl, (mBasePage)
+	ld	a, h
+	out	(pMPgAHigh), a
+	ld	a, l
+	out	(pMPgA), a
+	ret
+FixPageEnd:
 
 
 ;------ ------------------------------------------------------------------------

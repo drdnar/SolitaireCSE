@@ -15,7 +15,7 @@
 FreeCellRandomGame:
 	di
 	call	RandomSeed
-	call	NextRandomInt
+@:	call	NextRandomInt
 	im	2
 	ei
 	ld	a, l
@@ -23,7 +23,7 @@ FreeCellRandomGame:
 	jr	z, FreeCellRandomGame
 	ld	de, 32001
 	cpHlDe
-	jr	nc, FreeCellRandomGame
+	jr	nc, {-1@}
 	ld	de, (fcGameNumber)
 	ld	(fcPreviousGame), de
 	ld	(fcGameNumber), hl
@@ -527,9 +527,14 @@ _superMove:
 @:	ld	a, b
 	add	a, freeCellNo0
 	ld	l, a
+	ld	a, (currentStack)
+	cp	l
+	jr	z, {@}
 	call	GetStackDepth
 	jr	nz, {@}
-	inc	c
+	rlc	c
+	jr	nz, {@}
+	ld	c, 1
 @:	djnz	{-2@}
 	ld	l, freeCellNo0
 	call	GetStackDepth

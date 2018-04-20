@@ -133,9 +133,9 @@ GetGlyphWidth:
 	push	hl
 	ld	hl, fontWidthTable - ch1stPrintableChar
 	add	a, l
-	jr	nc, _ggw
+	jr	nc, $ + 3
 	inc	h
-_ggw:	ld	l, a
+	ld	l, a
 	ld	a, (hl)
 	pop	hl
 	ret
@@ -152,16 +152,16 @@ GetStrWidth:
 ;  - AF
 ;  - HL
 	ld	hl, 0
-_gswl:	ld	a, (de)
+@:	ld	a, (de)
 	inc	de
 	or	a
 	ret	z
 	call	GetGlyphWidth
 	add	a, l
-	jr	nc, _gswa
+	jr	nc, $ + 3
 	inc	h
-_gswa:	ld	l, a
-	jr	_gswl
+	ld	l, a
+	jr	{-1@}
 
 
 ;------ PutCSmall --------------------------------------------------------------
@@ -209,7 +209,6 @@ PutC:
 	push	de
 	push	hl
 	
-	; If APD while displaying something, the screen will get confused
 	sub	ch1stPrintableChar
 	ld	c, a
 	
@@ -238,7 +237,7 @@ _ptca:	ld	l, a
 	ld	l, a
 	
 ; Tell it we want to write pixels
-	di
+	di	; If Panic while displaying something, the screen will get confused
 	ld	a, lrGram
 	out	(pLcdCmd), a
 	out	(pLcdCmd), a

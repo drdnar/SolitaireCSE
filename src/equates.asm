@@ -348,7 +348,7 @@
 ;cmdShadow	equ	09BAAh ; Also expanded, but don't use this unless you want some crazy clean-up code
 ;statVars		equ	8C1Ch	; scrap 531 (clear b_call(_DelRes))
 ;appData	equ	8000h
-stacks		.equ	plotSScreen;statVars
+stacks		.equ	statVars
 guiRam		.equ	saveSScreen
 deck		.equ	appData
 undoStack	.equ	saveSScreen
@@ -360,10 +360,10 @@ IsrLocation	.equ	98h ; ISR at 9898h
 
 
 ;------ ISR Resident Routines --------------------------------------------------
-;InstantQuit	.equ	987Ch
-;RawGetCSC	.equ	98A0h
-;RealIsr		.equ	9A01h
-;ScanKeyboard	.equ	9AF0h
+FixPage		.equ	987Ch	; Max 28 bytes
+RawGetCSC	.equ	98A0h	; Max 96 bytes
+RealIsr		.equ	9A01h	; Max 239 bytes
+ScanKeyboard	.equ	9AF0h	; Max 140 bytes
 ;9B7C
 ;9A01 379 bytes
 
@@ -427,6 +427,9 @@ cursorPeriod		.equ	200h
 
 ;------ Flags ------------------------------------------------------------------
 ; These are used by the text input routines
+saveVarFlags		.equ	asm_Flag1
+rearchiveSaveVar	.equ	1
+rearchiveSaveVarM	.equ	2
 mKbdFlags		.equ	asm_Flag1
 ; Set to display error cursor
 kbdCurErr		.equ	2
@@ -497,7 +500,10 @@ rankK		.equ	4 * 12
 colorBlack	.equ	00
 colorGreen	.equ	04	; 06 for normal maximum saturation green
 colorBrGreen	.equ	06
+colorNavyBlue	.equ	08
+colorDarkBlue	.equ	10h
 colorBlue	.equ	18h
+colorDarkGray	.equ	6Bh
 colorGray	.equ	0B5h
 colorRed	.equ	0E0h
 colorYellow	.equ	0E7h
@@ -599,7 +605,7 @@ fcMoves		.equ	fcFreeCells + 2
 ; Statistics
 fcGamesQuit	.equ	fcMoves + 2
 fcGamesWon	.equ	fcGamesQuit + 2
-; This primarily used by the GUI's number input routine for storing the number being entered.
+; This us primarily used by the GUI's number input routine for storing the number being entered.
 ; It's also used in Klondike and FreeCell as a temporary variable.
 guiTemp		.equ	fcGamesWon + 2
 ; Function to execute when F1 is pressed, or null if none.

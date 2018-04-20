@@ -2,7 +2,7 @@
 
 
                                    Solitaire
-                                 April 15 2014
+                                  9 May 2014
 
 
 
@@ -67,9 +67,10 @@ home screen; see above for more information.
 SAVING
 
     Solitaire uses an appvar named Solitair to save your settings and
-statistics.  This appvar is 100 bytes in size at a minimum, and is always in 
-RAM.  If you archive the appvar, Solitaire will unarchive it, and will not
-rearchive it.
+statistics.  This appvar is 100 bytes in size at a minimum.  It is normally in
+RAM.  However, if you archive the appvar, Solitaire will always rearchive it for
+you when you quit.  This is not recommended, especially if you save a game,
+because it causes excessive wear on the archive memory.
 
     Additionally, while you are playing a game, Solitaire can save your game and
 resume it when you return to the app.  The saved game will always resume
@@ -197,6 +198,13 @@ graduating, you are unlikely to graduate.  Numbers 1941 and 10692 are also
 considered very hard, and 617 often trips up beginners, or so I'm told.  You
 can find solutions to all 31999 solvable games online in various places.
 
+    This implementation of FreeCell lets you select the number of free cells.
+The default is four.  If you add a fifth, even #11982 is solvable.  With a
+sixth, the game should be very easy.  Perhaps surprisingly, 99% of games are
+solvable with three free cells, and 80% are solvable with two.  See
+http://www.solitairelaboratory.com/fcfaq.html#WinRate for more information.
+(Yet, only 20% are solvable with one free cell.)
+
     After you win a game, a new, random game number is selected.  If you want to
 know the previous game number, select QUIT on the win screen, and then press
 WINDOW on the main menu screen.
@@ -210,7 +218,7 @@ Cemetech at
 http://www.omnimaga.org/ti-z80-calculator-projects/solitaire-klondike-and-freecell/
 and http://www.cemetech.net/forum/viewtopic.php?p=217810 (respectively).
 You may direct email to drdnar@gmail.com ; you should include Solitaire in the
-subject line so I what the email is about.
+subject line so I know what the email is about.
 
 ------ Credits -----------------------------------------------------------------
 
@@ -229,12 +237,24 @@ FreeCell for me.
 
 ------ Change Log --------------------------------------------------------------
 
-Build 954 (21 April 2014)
+Build 1000 (9 May 2014)
+ - Fixed supermove free cell count; now each free tableau slot doubles count as
+   it should
+ - Moved interrupts back into RAM to free up some space
+ - If the appvar is archived when you start Solitaire, it will be archived when
+   you quit.
+ - Finally added face card graphics
+ - Unless new bugs are discovered or somebody has a better idea for the face
+   card graphics, this is the last update.
+
+Build 956 (21 April 2014)
  - Optimized more
  - Added High Score text to Klondike win screen for comparison
  - Fixed bug in positioning of text in FreeCell win screen
  - Fixed YET ANOTHER bug in supermove in which you could not supermove to an
-   empty tableau slot
+   empty tableau slot, and also made it so the empty cell wouldn't count as free
+   because you're moving to it
+ - About 1700 free bytes remaining
 
 Build 922 (15 April 2014)
  - Optimized some stuff
@@ -244,9 +264,7 @@ Build 922 (15 April 2014)
  - Added time bonus
  - Edited readme for completeness
  - About 1600 free bytes remaining
- - Unless new bugs are discovered, or 4-color graphics are added, this is the
-   last update
- 
+
 Build 816 (10 April 2014)
  - Fixed minor bug with undo not deducting points if score was 1
  - Fixed bug in which supermove again failed to compute correct number of free

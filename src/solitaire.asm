@@ -1,15 +1,147 @@
+; This program is free software. It comes without any warranty, to
+; the extent permitted by applicable law. You can redistribute it
+; and/or modify it under the terms of the Do What The Fuck You Want
+; To Public License, Version 2, as published by Sam Hocevar. See
+; http://sam.zoy.org/wtfpl/COPYING for more details.
+
 ; Solitaire for the TI-84 Plus C SE
 ; Dr. D'nar
 ; drdnar@gmail.com
 ; Build using Brass (Ben Ryves Assembler) version 1.x
 
-; TODO: 
+; TODO:
 ;  - Make more moves release currently selected card
 ;  - Anti-battery drain: If same key repeats 255 times, APD
 ;  - Graphics for face cards
 ;  - Change graphics in FreeCell:
 ;     - FREECELL should have a box, no label for Home
-;  - Automove in FreeCell doesn't correctly consider all free cells?
+;  - Can we instant abort by using PowerOff instead of paging back into the app?
+;  - Pressing UP at top of stack should move to bottom
+;  - DrawHiddenCardHeader can possibly be optimized; it seems it would be smaller
+;    to make it a monochrome sprite
+;  - DrawStack can probably be simplified by calling GetCardLocation
+
+; So here's an overview of how Solitaire works:
+;  - The OS passes control to Solitaire
+;  - Solitaire initializes itself
+;     - It saves the current page for reference
+;     - It checks for the presence of its save appvar
+;        - If the appvar is absent, it creates it if enough RAM is available
+;        - If the appvar is present, it checks if the appvar is a Solitaire appvar
+;           - If it is, it loads the data in the appvar and saves a pointer to it
+;        - It checks how much free RAM is available
+;          and uses that information to decide what can be saved on termination:
+;          Nothing, stats only, game without undo, or game with undo
+;     - Once all that is done, the game will initialize interrupts
+;       and change the screen mode to match Solitaire's needs
+;  - If a game was loaded, it jumps into the correct game play loop
+;  - If there was an error accessing the save appvar, it will present the error dialog
+;  - Then control is passed to the main menu
+;     - The main menu will clear the screen
+;     - Some GUI structures will be loaded into RAM
+;       so they can be mutated depending on user actions
+;        - These structures contain callbacks for important actions
+;           - Paint
+;           - Enter control
+;        - There are also pointers to physically nearby controls
+;          so the arrow keys work
+;        - Each item also has a pointer to the next item in the GUI list,
+;          so items can be located in both RAM and flash
+;     - The currently selected game's options are linked into the GUI list
+;     - The GUI paint function is called
+;        - The GUI paint function will walk the GUI list
+;          and call the paint method for each item
+;     - Then control is passed to the GUI event processing loop
+;        - IX always holds a reference to the currently highlighted/active GUI control
+;        - The GUI event loop highlights the current control
+;        - It waits for keyboard input and uses the navigation vectors on
+;          the current control to give focus to a new control
+;        - When the ENTER key is pressed, control is passed to the item
+;           - This is a jump, not a call; to return to the GUI event loop,
+;             you JP back to GuiEventLoop
+;           - When changing the selected game, the function will
+;             change pointers in the GUI list
+;              - It will also paint the correct options
+;              - It then jumps into the radio button's normal callback
+;           - For the radio buttons, the radio button callback walks the GUI list
+;              - The radio button has a pointer to a RAM variable to change,
+;                and a value to write
+;              - Radio buttons have a group ID byte
+;              - Every item in the same group is marked inactive, except the selected one
+;     - Eventually, control is passed either to StartGame or SaveAndQuit
+;  - StartGame will set bit 7 of selectedGame to show that a game is in progress,
+;    and start the game
+;  - SaveAndQuit saves all possible information
+;     - SaveAndQuit is also called to save an in-progress game when you press MODE
+;     - And it's the exact same function the saves an in-progress when upon APD
+;     - SaveAndQuit uses the free RAM information discovered at initialization
+;       to figure out what it can write
+;     - It first empties the appvar
+;     - Then incrementally adds memory to the appvar depending on what should be saved
+;     - If saving is possible, SaveAndQuit will write all stats
+;     - If a game is in-progress and there is sufficient RAM, it save the game
+;     - Here's a mystery: Erase the Solitaire appvar, and run Solitaire
+;       with less than 200 bytes of free RAM.  Start a game.  Quit using MODE.
+;       Solitaire loads all stats fine, but somehow Solitaire knows no game was saved
+;       and I have no clue how.  I'm sure I wrote code to handle that;
+;       I just can't remember doing so, nor why it works.
+;  - Eventually, a game is started
+;     - The game will load the stack definitions into RAM
+;        - These definitions contain flags for stack,
+;          as well position and arrow key navigation information
+;     - The game will generate a new game
+;     - The game will clear the screen
+;     - Control is passed to CardsPlayLoop for both Klondike and FreeCell
+;        - This is a lot like GuiEventLoop
+;        - Each stack has references to other stacks for arrow key movement
+;        - One card is always highlighted by the cursor (currentStack/CurrentCard)
+;     - There are callbacks for event keys
+;        - These callbacks are where Klondike and FreeCell differ
+;     - There's a timer callback, too, which Klondike uses
+;  - FreeCell is simpler than Klondike
+;     - There's a card under the cursor, and a selected card
+;     - The movement routines logic isn't complicated
+;        - But there are lots of special checks
+;        - For example, movement to free cells is different than to home cells
+;        - Also, supermove.  That keep giving me headaches.
+;     - FreeCell's undo is better
+;       - After every move, FreeCell stores the information necessary to undo the move
+;       - This is just 3 bytes!  So a 768-byte buffer can store 256 undo steps!
+;       - But there also has to be a count of the total number of undo steps present
+;          - This counter is 8-bit, so it only goes from 0 to 255
+;       - Undo is implemented as a circular buffer; if you do more than 255 moves,
+;         the first move is overwritten, then the second, &c.
+;  - Klondike has special needs FreeCell doesn't have
+;     - It does special checks for whether you're clicking on the deck graphic
+;     - The "waste" (cards from the deck) is a major headache
+;        - I didn't feel like working out the logic to make it undoable
+;     - The waste keeps card order, but may have empty cards in it
+;     - Cards are returned to the waste to the same location they were before
+;       unless a card was removed and played in the tableau or foundations
+;     - The undo for Klondike sucks
+;        - It just saves all variables and the waste
+;          so that I don't have to do any thinking
+;        - This takes about 128 bytes, so there's a maximum of
+;          6 undos in a 768-byte buffer
+;  - Both games check for the win condition by looking
+;    at the number of cards in the foundations
+; 
+; Also be aware of:
+;  - Custom interrupts drive the keyboard driver and provide timing
+;     - The interrupt driver decrements the APD timer,
+;       but GuiEventLoop and CardsPlayLoop are responsible for actually handling the APD event
+;  - The screen driver requires some different settings than the OS
+;     - Text is painted top-to-bottom, left-to-right; most people scan pixels
+;       left-to-right, top-to-bottom
+;        - I do this so that after a glyph is painted,
+;          the cursor is in position for the next glyph
+;        - Thus, the left/right LCD window bounds are normally 0/319
+;          and cursor position is not explicitly set prior to drawing a glyph
+;        - The top/bottom bounds are only ever set when you change line
+;        - (In other people's routines, the LCD left/right bounds and cursor position
+;          must be set prior to every single glyph!)
+;     - All routines use "8-bit" color, in which the high and low bytes are the same
+;        - (Recall that the LCD actually wants 16-bit color, packed as 5/6/5 RGB.)
 
 .nolist
 .include "ti84pcse.inc"
@@ -34,7 +166,7 @@ program_start:
 ;	.db	80h, 49h, "Solitaire"
 	.db	80h, 40h + {2@} - {@}
 @:	.db	"Solitair"
-@:	; Disable TI splash screen.  Also, pointer to the jump table.
+@:	; Disable TI splash screen.
 	.db	80h, 90h
 	; Revision
 	.db	80h, 21h, 1
@@ -60,31 +192,36 @@ generic_stuff_start:
 Restart:
 ; Memory
 	di
-	; TODO: If I move the ISR back into RAM, have it do instant aborts by
-	; just PowerOffing back to the OS, instead of returning to the app?
-;	in	a, (pMPgAHigh)
-;	ld	h, a
-;	in	a, (pMPgA)
-;	ld	l, a
-;	ld	(mBasePage), hl
+	im	1
+	in	a, (pMPgAHigh)
+	ld	h, a
+	in	a, (pMPgA)
+	ld	l, a
+	ld	(mBasePage), hl
+
+	; Initialize vars, implicitly reset setApdNow and rearchiveSaveVar
+.if	mSettings != saveVarFlags
+	.error	"Adjust code that initializes mSettings and saveVarFlags.\n"
+.endif
+	ld	(iy + mSettings), setApdEnabledM
 
 	; This is important
 	ld	a, cpu15MHz
 	; OK, not really, but it helps a lot.
 	out	(pCpuSpeed), a
 	
-	res	indicRun, (iy + shiftFlags)
+;	res	indicRun, (iy + shiftFlags)
 
 ;------ Appvar Check -----------------------------------------------------------
 	; Erase stuff
+	xor	a
 	ld	hl, rngState
-	ld	(hl), 0
+	ld	(hl), a
 	ld	de, rngState + 1
 	ld	bc, end_of_game_vars - rngState - 1
 	ldir
-	
-; Saving
-	xor	a
+	; Saving
+	;xor	a ; Recycled from above
 	ld	(saveError), a
 	ld	hl, appvarName
 	rst	rMOV9TOOP1
@@ -95,8 +232,8 @@ Restart:
 	; Create appvar
 	ld	a, seLowRam
 	ld	(saveError), a
-	ld	hl, saveVarMode
-	ld	(hl), 0
+	xor	a		;	ld	hl, saveVarMode
+	ld	(saveVarMode), a;	ld	(hl), 0
 	ld	hl, saveStatsSize + 20
 	b_call(_EnoughMem)
 	jp	c, _appvarStuffDone
@@ -153,6 +290,7 @@ _initalizeKnownGoodSettings:	; Initialize variables
 	ld	hl, 4
 	ld	(fcFreeCells), hl
 	ret
+
 ; Appvar found
 _dontCreateAppVar:
 	; Is appvar in RAM?
@@ -167,8 +305,8 @@ _dontCreateAppVar:
 	inc	b
 @:	b_call(_LoadDEIndPaged)
 	ex	de, hl
-	ld	de, 10
-	add	hl, de
+;	ld	de, 10
+;	add	hl, de
 	b_call(_EnoughMem)
 	jr	nc, {@}
 	; Not enough RAM to unarchive
@@ -180,6 +318,7 @@ _dontCreateAppVar:
 	jp	_appvarStuffDone
 @:	; Unarchive variable
 	b_call(_Arc_Unarc)
+	set	rearchiveSaveVar, (iy + saveVarFlags)
 	; Fetch pointer to data
 	ld	hl, appvarName
 	rst	rMOV9TOOP1
@@ -306,30 +445,13 @@ _dontLoadGame:
 _appvarStuffDone:
 	di
 	
-	; RAM-Resident Routines
-;	ld	hl, ScanKeyboardSource
-;	ld	de, ScanKeyboard
-;	ld	bc, (ScanKeyboardSource - 2)
-;	ldir
-;	ld	hl, RawGetCSCSource
-;	ld	de, RawGetCSC
-;	ld	bc, (RawGetCSCSource - 2)
-;	ldir
-;	ld	hl, RealIsrSource
-;	ld	de, RealIsr
-;	ld	bc, (RealIsrSource - 2)
-;	ldir
-;	ld	hl, InstantQuitSource
-;	ld	de, InstantQuit
-;	ld	bc, (InstantQuitSource - 2)
-;	ldir
-	
 	; Interrupts
-	ld	bc, suspendDelay
-	ld	(suspendTimer), bc
+	ld	hl, suspendDelay
+	ld	(suspendTimer), hl
 	call	SetUpInterrupts
-	set	setApdEnabled, (iy + mSettings)
-	res	setApdNow, (iy + mSettings)
+	; These are set higher up
+;	set	setApdEnabled, (iy + mSettings)
+;	res	setApdNow, (iy + mSettings)
 	ei
 	
 	ld	hl, 0FF00h
@@ -423,11 +545,11 @@ SaveAndQuit:
 	; Should we save a game?
 	ld	a, (saveVarMode)
 	cp	2
-	jp	c, Quit
+	jr	c, _saveDone
 ; Is there a game in progress to save?
 	ld	a, (selectedGame)
 	bit	7, a
-	jp	z, Quit
+	jr	z, _saveDone
 	; Allocate more memory
 	push	de
 	ld	hl, saveGameSize - saveStatsSize
@@ -448,7 +570,7 @@ SaveAndQuit:
 ; Save undo stack
 	ld	a, (saveVarMode)
 	cp	3
-	jp	c, Quit
+	jr	c, _saveDone
 	; Allocate more memory
 	push	de
 	ld	hl, saveUndoSize - saveGameSize
@@ -463,8 +585,14 @@ SaveAndQuit:
 	ld	hl, undoStack
 	ld	bc, 768
 	ldir
-	jp	Quit
-
+_saveDone:
+	bit	rearchiveSaveVar, (iy + saveVarFlags)
+	jr	z, Quit
+	ld	hl, appvarName
+	rst	rMOV9TOOP1
+	b_call(_Arc_Unarc)
+	jr	Quit
+	
 
 ;------ Panic routine ----------------------------------------------------------
 errorText:	.db	"BUG CHECK: ", 0
@@ -495,20 +623,12 @@ Panic:
 	ld	hl, 0
 	ld	d, 12
 	call	Locate
-	pop	hl
+	ld	b, 4
+@:	pop	hl
 	call	DispHL
 	ld	a, ' '
 	call	PutC
-	pop	hl
-	call	DispHL
-	ld	a, ' '
-	call	PutC
-	pop	hl
-	call	DispHL
-	ld	a, ' '
-	call	PutC
-	pop	hl
-	call	DispHL
+	djnz	{-1@}
 	ld	hl, 0
 	ld	d, 24
 	call	Locate
@@ -551,13 +671,13 @@ Quit:
 ;	ld	(hl), '@' ; space
 ;	ld	bc, 259
 ;	ldir
-;	Actually, this doesn't need to be cleared.
+;	Actually, this doesn't need to be cleared either.
 ;	ld	hl, textShadow
 ;	ld	de, textShadow+1
 ;	ld	(hl), '!'
 ;	ld	bc, 259
 ;	ldir
-;	b_call(_DelRes)
+	b_call(_DelRes)
 	b_call(_DrawStatusBarInfo)
 ; Use these if you're a RAM program
 ;	b_call(_DrawStatusBar)
@@ -634,20 +754,6 @@ font_start:
 font_end:
 
 
-;====== Embedded IVT & ISR =====================================================
-interrupt_burn_start:
-.fill	256 - ($ & 255), 255
-InterruptVectorTable:
-;.echo	(($ + 256) / 256), "\n"
-ivt_fill_byte	.equ	(($ + 256) >> 8)
-.fill	257, ivt_fill_byte
-;.echo	($ - 1) / 256, "\n"
-.fill	ivt_fill_byte - 1, 255
-InterruptHandler:
-	jp	RealIsr
-;.echo	InterruptHandler, "\n"
-interrupt_burn_end:
-
 program_end:
 
 
@@ -657,23 +763,17 @@ program_end:
 .endif
 .echo	" * INFORMATION & STATISTICS * \n"
 .echo	"Build number: ", BUILD, "\n"
-.echo	"Last main address used: "
-EchoWord(interrupt_burn_start)
-.echo	"h\nSpace wasted between end of app and IVT: ", InterruptVectorTable - interrupt_burn_start, " bytes\n"
-.echo	"IVT location: "
-EchoWord(InterruptVectorTable)
-.echo	"h\nIVT fill byte: "
-EchoByte(ivt_fill_byte)
-.echo	"h\nInterruptHandler: "
-EchoWord(InterruptHandler)
-.echo	"h\n"
 .echo	"Main RAM vars: ", end_of_game_vars - start_of_static_vars, " bytes\n"
 .echo	"Core saved vars size: ", end_of_game_vars - first_saved_var, " bytes\n"
 .echo	" * SIZES * \n"
+.echo	"ScanKeyboard size: ", ScanKeyboardEnd - ScanKeyboardSource, " bytes\n"
+.echo	"RawGetCSC size: ", RawGetCSCEnd - RawGetCSCSource, " bytes\n"
+.echo	"RealIsr size: ", RealIsrEnd - RealIsrSource, " bytes\n"
+.echo	"FixPage size: ", FixPageEnd - FixPageSource, " bytes\n"
 .echo	"Initalization & termination code size: ", generic_stuff_end - generic_stuff_start, " bytes\n"
 .echo	"Main menu size: ", mainmenu_end - mainmenu_start, " bytes\n"
-.echo	"Main menu GUI elemnts: ", gui_table_end - gui_table_start, " bytes\n"
-.echo	"Main menu RAM GUI elements: ", gui_table_end - guiRam_start, " bytes\n"
+.echo	" Main menu GUI elemnts: ", gui_table_end - gui_table_start, " bytes\n"
+.echo	" Main menu RAM GUI elements: ", gui_table_end - guiRam_start, " bytes\n"
 .echo	"GUI library size: ", gui_end - gui_start, " bytes\n"
 .echo	"Klondike game size: ", klondike_end - klondike_start, " bytes\n"
 .echo	"FreeCell game size: ", freecell_end - freecell_start, " bytes\n"
@@ -685,8 +785,9 @@ EchoWord(InterruptHandler)
 .echo	"Text driver size: ", text_end - text_start, " bytes\n"
 ;.echo	"LCD & text driver size: ", text_end - lcd_start, " bytes\n"
 .echo	"Data size: ", data_end - data_start, " bytes\n"
+.echo	" Non-sprites data size: ", sprites_start - data_start, " bytes\n"
+.echo	" Sprites data size: ", data_end - sprites_start, " bytes\n"
 .echo	"Font size: ", font_end - font_start, " bytes\n"
-.echo	"IVT & ISR burned space: ", interrupt_burn_end - interrupt_burn_start, " bytes\n"
 .echo	"Total program code & data: ", program_end - program_start, " bytes\n"
 .echo	"Space remaining: ", 7FBBh - program_end, " bytes\n"
 .ifdef	FREECELL_DEBUG

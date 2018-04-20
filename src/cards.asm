@@ -4,6 +4,8 @@
 ; To Public License, Version 2, as published by Sam Hocevar. See
 ; http://sam.zoy.org/wtfpl/COPYING for more details.
 
+; This file mostly contains graphical code common to Klondike and FreeCell.
+; It also contains the core event loop that is common to Klondike and FreeCell.
 
 stacksTable:
 	.dw	stack0
@@ -1600,8 +1602,27 @@ DrawCardBody:
 	ld	a, (ix - 4)
 	cp	colorScrnHeight - cardBodyHeight
 	call	c, DrawHorizLine
-	; Draw card graphic
+; Draw card graphic
 	ld	a, (ix - 3)
+	cp	rankJ
+	; It's a face card.  Draw face card sprite instead.
+	jr	c, _dcbNotFaceCard
+	add	a, a
+	ld	hl, faceCardsSprites - (rankJ * 2)
+	add	a, l
+	jr	nc, $ + 3
+	inc	h
+	ld	l, a
+	ld	c, (hl)
+	inc	hl
+	ld	b, (hl)
+	ld	l, (ix - 2)
+	ld	h, (ix - 1)
+	inc	hl
+	ld	d, (ix - 4)
+	call	DrawFourColorSprite
+	jp	_dcbdone
+_dcbNotFaceCard:
 	cp	36
 	jr	nz, _dcbnotclubs
 	; Ten of clubs gets a special graphic
@@ -1639,10 +1660,7 @@ _dcbnotclubs:
 	ld	a, colorScrnHeight
 	sub	(ix - 4)
 	ld	e, a
-@:	;ld	a, (ix - 3)	; Only fill if not face card, which will draw BG as part of sprite
-	;cp	rankJack	; No need to mask. . . 
-	;call	c, DrawFilledRect
-	call	DrawFilledRect
+@:	call	DrawFilledRect
 	; Symbols
 	ld	a, (ix - 3)
 	push	af
@@ -1661,9 +1679,6 @@ _dbccolor:
 	and	7Eh
 	cp	13 * 2
 	call	nc, Panic
-	;cp	TODO: Special graphics for face cards
-;	cp	rankJack
-;	jr	nc, _dcbface
 	ld	hl, _dcbSuitsLocationsTable
 	add	a, l
 	jr	nc, $ + 3
@@ -1697,23 +1712,6 @@ _dcbsymloop:
 	add	a, chSmallClub
 	call	PutCSmall
 	jr	_dcbsymloop
-;_dcbface:
-;	Remember when building sprite ptr table to subtract rankJack * 2 from equate
-;	so you don't have to subtract
-;	ld	a, (ix - 3)
-;	add	a, a
-;	ld	hl, faceCardsSpritesTable
-;	add	a, l
-;	jr	nc, $ + 3
-;	inc	h
-;	ld	l, a
-;	ld	c, (hl)
-;	inc	hl
-;	ld	b, (hl)
-;	ld	l, (ix - 2)
-;	ld	h, (ix - 1)
-;	ld	d, (ix - 4)
-;	call	DrawFourColorSprite
 _dcbdone:
 	ld	a, colorBlack
 	ld	(textForeColor), a
@@ -1733,9 +1731,9 @@ _dcbSuitsLocationsTable:
 	.dw	_dcbRank8
 	.dw	_dcbRank9
 	.dw	_dcbRank10
-	.dw	_dcbRankA
-	.dw	_dcbRankA
-	.dw	_dcbRankA
+;	.dw	_dcbRankA
+;	.dw	_dcbRankA
+;	.dw	_dcbRankA
 _dcbRank9:
 	.db	10, 1
 	.db	10, 17

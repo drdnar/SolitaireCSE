@@ -134,8 +134,8 @@ PeekCSC:
 
 ;------ Scan Keyboard ----------------------------------------------------------
 ;	.dw	ScanKeyboardEnd - ScanKeyboardSource
-;ScanKeyboardSource:
-ScanKeyboard:
+ScanKeyboardSource:
+;ScanKeyboard:
 ; Implements the core logic used for keyboard scanning, including timing for
 ; debouncing.
 ; You can call this manually if interrupts are disabled, but you will need to do
@@ -225,13 +225,13 @@ _acceptKeypress:
 	ld	a, (lastKey)
 	ld	(keyBuffer), a
 	ret
-;ScanKeyboardEnd:
+ScanKeyboardEnd:
 
 
 ;------ GetCSC -----------------------------------------------------------------
 ;	.dw	RawGetCSCEnd - RawGetCSCSource
-;RawGetCSCSource:
-RawGetCSC:
+RawGetCSCSource:
+;RawGetCSC:
 ; Scans the keyboard matrix for any pressed key, returning the first it finds,
 ; or 0 if none.
 ; Inputs:
@@ -272,7 +272,7 @@ _gcscc:	rrca
 	jr	c, _gcscc
 	ld	a, b
 	ret
-;RawGetCSCEnd:
+RawGetCSCEnd:
 
 
 ;------ ------------------------------------------------------------------------
