@@ -298,15 +298,32 @@ _cpkdo:	; Unhighlight selected card
 	cp	skClear
 	jp	z, _cpAbort;Quit
 	cp	skMode
-	jp	z, {@}
+	jp	z, _cplQuit
 	cp	skGraphVar
+	jr	z, _cplSaveAndQuit
+	ld	hl, _stacksMapTable
+	call	MapTable
 	jr	nz, CardsPlayLoop
+	ld	a, (selectedGame)
+	and	3
+	ld	a, b
+	jr	nz, {@}
+	cp	7
+	jr	z, CardsPlayLoop
+@:	; TODO: Finish targeting stack to jump to
+	ld	(currentStack), a
+	ld	l, a
+	call	GetTopCardNumber
+	ld	(currentDepth), a
+	jp	CardsPlayLoop
+_cplSaveAndQuit:
 	ld	hl, saveVarMode
 	ld	a, (hl)
 	cp	3
 	jr	nz, {@}
 	dec	(hl)
-@:	call	UnselectCard
+_cplQuit:
+	call	UnselectCard
 	jp	SaveAndQuit
 _cpSelect:
 	ld	hl, (selectCardCallback)
@@ -443,6 +460,16 @@ _cpMoveUp:
 	jp	nz, CardsPlayLoop
 	ld	(currentDepth), a
 	jp	CardsPlayLoop
+_stacksMapTable:
+	.db	8
+	.db	sk1, 0
+	.db	sk2, 1
+	.db	sk3, 2
+	.db	sk4, 3
+	.db	sk5, 4
+	.db	sk6, 5
+	.db	sk7, 6
+	.db	sk8, 7
 
 
 ;------ TryToMoveCardsToHomeCell -----------------------------------------------
