@@ -303,6 +303,46 @@ _gsia:	cp	(hl)
 	ret
 
 
+#ifdef	NEVER
+;------ MapJumpTable -----------------------------------------------------------
+MapJumpTable:
+; Branches from a jump table based on a key press.
+; The table will look like this:
+;	.db	compareValue1
+;	.dw	jumpTarget1
+;	.db	compareValue2
+;	.dw	jumpTarget2
+;	. . .
+;	.db	0
+; Inputs:
+;  - A: Value to compare
+;  - HL: Location of table
+; Output:
+;  - Branches based on output
+;  - If branch is successful, top stack entry is eaten
+;  - If no match is found, returns to caller
+; Destroys:
+;  - AF, B, HL
+	ld	b, a
+_mjtLoop:
+	ld	a, (hl)
+	inc	hl
+	or	a
+	ret	z
+	cp	b
+	jr	z, _mklb
+	inc	hl
+	inc	hl
+	jr	_mjtLoop
+_mklb:	pop	af
+	ld	a, (hl)
+	inc	hl
+	ld	h, (hl)
+	ld	l, a
+	jp	(hl)
+#endif
+
+
 ;------ MapTable ---------------------------------------------------------------
 MapTable:
 ; Scans a table mapping an input in A to an output in B.
