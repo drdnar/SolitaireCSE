@@ -252,6 +252,10 @@ _ptca:	ld	l, a
 	ld	e, a
 _ptcb:
 ; Let's optimize with loop unrolling!
+; The idea here is that JR takes five fewer cycles if a branch is not taken.
+; Since glyphs will tend to have columns of same-color pixels (vertical lines,
+; vertical spaces), most of the jumps won't be taken, saving a few cycles each
+; time.
 ; Main output loop
 ; A = bitmap being processed
 ; B = bit/byte loop counter
