@@ -849,6 +849,11 @@ _kdDrawCards:
 	call	_kdInvalidateStats
 @:	and	0Fh
 	ld	(kdDeckMode), a
+	; Now is a reasonable, if random, time to move the cursor
+	ld	a, (currentStack)
+	cp	dealCellNo
+	ld	a, deckCellNo
+	call	nz, SelectStack
 	; Check if a card in the deal stack is selected
 	ld	a, (selectedStack)
 	cp	dealCellNo

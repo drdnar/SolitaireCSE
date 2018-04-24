@@ -281,41 +281,88 @@ _cpkdo:	; Unhighlight selected card
 	push	af
 	call	HighlightCurrentCard
 	pop	af
-	cp	6
-	jr	c, _cpMove
 	cp	skEnter
 	jr	z, _cpSelect
 	cp	sk2nd
 	jr	z, _cpSelect
 	cp	skAlpha
 	jr	z, _cpSelect2
+	cp	skStore
+	jr	z, _cpSelect2
 	cp	skYEqu
+	jr	z, _cpF1
+	cp	skAdd
 	jr	z, _cpF1
 	cp	skWindow
 	jr	z, _cpF2
 	cp	skGraph
 	jr	z, _cpF5
 	cp	skClear
-	jp	z, _cpAbort;Quit
+	jr	z, _cpAbort;Quit
 	cp	skMode
-	jp	z, _cplQuit
+	jr	z, _cplQuit
 	cp	skGraphVar
 	jr	z, _cplSaveAndQuit
+;	ld	hl, _cpKeyTable
+;	call	MapJumpTable
+	cp	skLeft
+	jr	z, _cpMoveGo
+	cp	skRight
+	jr	z, _cpMoveGo
+	cp	6
+	jr	c, _cpMoveWithinStack
+	cp	skDiv
+	jr	z, _cpMoveWithinStack
+	cp	skMul
+	jr	z, _cpMoveWithinStack
 	ld	hl, _stacksMapTable
 	call	MapTable
 	jr	nz, CardsPlayLoop
-	ld	a, (selectedGame)
-	and	3
-	ld	a, b
-	jr	nz, {@}
-	cp	7
+	; Check if stack is valid to jump cursor to
+	ld	l, b
+	call	DerefStack	; First byte will be 255 if stack is unused in current game
+	ld	a, (hl)
+	inc	a
 	jr	z, CardsPlayLoop
-@:	; TODO: Finish targeting stack to jump to
-	ld	(currentStack), a
-	ld	l, a
-	call	GetTopCardNumber
-	ld	(currentDepth), a
-	jp	CardsPlayLoop
+	ld	a, b
+	call	SelectStack
+	jr	CardsPlayLoop
+;_cpKeyTable:
+;	.db	skEnter
+;	.dw	_cpSelect
+;	.db	sk2nd
+;	.dw	_cpSelect
+;	.db	skAlpha
+;	.dw	_cpSelect2
+;	.db	skStore
+;	.dw	_cpSelect2
+;	.db	skYEqu
+;	.dw	_cpF1
+;	.db	skAdd
+;	.dw	_cpF1
+;	.db	skWindow
+;	.dw	_cpF2
+;	.db	skGraph
+;	.dw	_cpF5
+;	.db	skClear
+;	.dw	_cpAbort
+;	.db	skMode
+;	.dw	_cplQuit
+;	.db	skGraphVar
+;	.dw	_cplSaveAndQuit
+;	.db	0
+	; 25 bytes
+;	ld	a, (selectedGame)
+;	and	3
+;	ld	a, b
+;	jr	nz, {@}
+;	cp	7
+;	jr	z, CardsPlayLoop
+;@:	ld	(currentStack), a
+;	ld	l, a
+;	call	GetTopCardNumber
+;	ld	(currentDepth), a
+;	jp	CardsPlayLoop
 _cplSaveAndQuit:
 	ld	hl, saveVarMode
 	ld	a, (hl)
@@ -353,24 +400,10 @@ _cpAbort:
 	call	UnselectCard
 	ld	ix, abortDialog
 	jp	ShowModalDialog
-_cpMove:
-	ld	hl, currentStack
-	ld	l, (hl)
-	call	DerefStack
-	cp	skLeft
-	jr	z, _cpMoveGo
-	cp	skRight
-	jr	z, _cpMoveGo
-	bit	stackShowOnlyTop, (hl)
-	jr	z, _cpMoveWithinStack
-;	cp	skUp
-;	jr	nz, _cpMoveGo
-;	ld	b, a
-;	ld	a, (currentDepth)
-;	or	a
-;	jr	nz, _cpMoveUp
-;	ld	a, b
 _cpMoveGo:
+	cp	6
+	jp	nc, CardsPlayLoop
+	call	GetCurrentStackPtr
 	dec	a
 ;	add	a, a
 	add	a, 4	; Added value!
@@ -382,12 +415,12 @@ _cpMoveGo:
 	inc	a
 	jp	z, CardsPlayLoop
 	dec	a
-	ld	(currentStack), a
-	ld	l, a
-	call	GetTopCardNumber
-	ld	(currentDepth), a
+	call	SelectStack
 	jp	CardsPlayLoop
 _cpMoveWithinStack:
+	call	GetCurrentStackPtr
+	bit	stackShowOnlyTop, (hl)
+	jr	nz, _cpMoveGo
 	ld	b, a
 	ld	a, (currentStack)
 	cp	dealCellNo
@@ -401,6 +434,8 @@ _cpMoveWithinStack:
 ;	bit	stackShowOnlyTop, (hl)
 ;	jr	nz, _cpMoveGo
 	cp	skUp
+	jr	z, _cpMoveUp
+	cp	skDiv
 	jr	z, _cpMoveUp
 	ld	a, (hl)
 	and	stackCountM
@@ -461,7 +496,7 @@ _cpMoveUp:
 	ld	(currentDepth), a
 	jp	CardsPlayLoop
 _stacksMapTable:
-	.db	8
+	.db	19
 	.db	sk1, 0
 	.db	sk2, 1
 	.db	sk3, 2
@@ -470,6 +505,33 @@ _stacksMapTable:
 	.db	sk6, 5
 	.db	sk7, 6
 	.db	sk8, 7
+	.db	sk0, dealCellNo
+	.db	skCos, homeCellNo0
+	.db	skTan, homeCellNo1
+	.db	skLParen, homeCellNo2
+	.db	skRParen, homeCellNo3
+	.db	skMath, freeCellNo0
+	.db	skMatrix, freeCellNo1
+	.db	skRecip, freeCellNo2
+	.db	skSin, freeCellNo3
+	.db	skSquare, freeCellNo4
+	.db	skComma, freeCellNo5
+
+
+;------ SelectStack ------------------------------------------------------------
+SelectStack:
+; Moves the cursor to a particular stack.
+; Input:
+;  - A: Stack number
+; Output:
+;  - Cursor moved
+; Destroys:
+;  - AF, HL
+	ld	(currentStack), a
+	ld	l, a
+	call	GetTopCardNumber
+	ld	(currentDepth), a
+	ret
 
 
 ;------ TryToMoveCardsToHomeCell -----------------------------------------------
@@ -1183,6 +1245,20 @@ RemoveCard:
 	call	DerefStack
 	dec	(hl)
 	ret
+
+
+;------ GetCurrentStackPtr -----------------------------------------------------
+GetCurrentStackPtr:
+; Returns a pointer to the current stack.
+; Inputs:
+;  - None
+; Output:
+;  - HL: Pointer
+; Destroys:
+;  - Nothing
+	ld	hl, currentStack
+	ld	l, (hl)
+;	jp	DerefStack
 
 
 ;------ DerefStack -------------------------------------------------------------

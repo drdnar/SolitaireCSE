@@ -238,6 +238,17 @@ _dda2:	add	a, '0'
 
 ;====== Routines ===============================================================
 
+#ifdef	NEVER
+;------ ToHlButDontJumpToNull --------------------------------------------------
+ToHlButDontJumpToNull:
+; Does JP (HL), unless HL is null, in which case it returns to caller.
+	ld	a, l
+	or	h
+	ret	z
+	jp	(hl)
+#endif
+
+
 ;------ CompareStrings ---------------------------------------------------------
 CompareStrings:
 ; Checks if two null terminated strings are identical.
