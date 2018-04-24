@@ -88,7 +88,7 @@ fontWidthTable:
 	.db	5	; ] ]
 	.db	6	; ^ ^
 	.db	8	; _ _
-	.db	4	; ` `
+	.db	1;4	; ` `
 	.db	7	; a a
 	.db	7	; b b
 	.db	7	; c c
