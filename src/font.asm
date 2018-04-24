@@ -1,3 +1,4 @@
+; The following glyphs have been removed because they weren't being used: <>[\]^_`{|}~
 font:
 ; GLYPH WIDTH TABLE
 fontWidthTable:
@@ -1077,20 +1078,6 @@ fontChar3B: ; ; ;
 	.db	00000001b
 	.db	8 ; remaining bits in final byte
 	.db	00000000b
-fontChar3C: ; < <
-	.db	10 ; body byte count
-	.db	00100000b
-	.db	00000000b
-	.db	00000111b
-	.db	11011000b
-	.db	11000000b
-	.db	00011000b
-	.db	00000110b
-	.db	00100011b
-	.db	00100000b
-	.db	00000000b
-	.db	4 ; remaining bits in final byte
-	.db	00000000b
 fontChar3D: ; = =
 	.db	10 ; body byte count
 	.db	10010000b
@@ -1102,20 +1089,6 @@ fontChar3D: ; = =
 	.db	10010000b
 	.db	00000000b
 	.db	00001001b
-	.db	00000000b
-	.db	4 ; remaining bits in final byte
-	.db	00000000b
-fontChar3E: ; > >
-	.db	10 ; body byte count
-	.db	00000010b
-	.db	01100010b
-	.db	00110000b
-	.db	10001100b
-	.db	10000001b
-	.db	00001101b
-	.db	01110000b
-	.db	00000000b
-	.db	00000010b
 	.db	00000000b
 	.db	4 ; remaining bits in final byte
 	.db	00000000b
@@ -1132,21 +1105,6 @@ fontChar3F: ; ? ?
 	.db	00000000b
 	.db	00000000b
 	.db	4 ; remaining bits in final byte
-	.db	00000000b
-fontChar40: ; @ @
-	.db	11 ; body byte count
-	.db	11111100b
-	.db	11100001b
-	.db	00111111b
-	.db	00000010b
-	.db	00100010b
-	.db	00101111b
-	.db	11110010b
-	.db	11100010b
-	.db	00101111b
-	.db	01111100b
-	.db	00000010b
-	.db	8 ; remaining bits in final byte
 	.db	00000000b
 fontChar41: ; A A
 	.db	10 ; body byte count
@@ -1520,75 +1478,6 @@ fontChar5A: ; Z Z
 	.db	00000010b
 	.db	8 ; remaining bits in final byte
 	.db	00000000b
-fontChar5B: ; [ [
-	.db	7 ; body byte count
-	.db	11111110b
-	.db	11100011b
-	.db	00111111b
-	.db	00000010b
-	.db	00100010b
-	.db	00100000b
-	.db	00000000b
-	.db	4 ; remaining bits in final byte
-	.db	00000000b
-fontChar5C: ; \ \
-	.db	7 ; body byte count
-	.db	00011110b
-	.db	10000000b
-	.db	00000111b
-	.db	11100000b
-	.db	00000001b
-	.db	01111000b
-	.db	00000000b
-	.db	4 ; remaining bits in final byte
-	.db	00000000b
-fontChar5D: ; ] ]
-	.db	7 ; body byte count
-	.db	00000010b
-	.db	00100010b
-	.db	00100000b
-	.db	11111110b
-	.db	11100011b
-	.db	00111111b
-	.db	00000000b
-	.db	4 ; remaining bits in final byte
-	.db	00000000b
-fontChar5E: ; ^ ^
-	.db	8 ; body byte count
-	.db	00001100b
-	.db	01100000b
-	.db	00000000b
-	.db	00000011b
-	.db	01100000b
-	.db	00000000b
-	.db	00001100b
-	.db	00000000b
-	.db	8 ; remaining bits in final byte
-	.db	00000000b
-fontChar5F: ; _ _
-	.db	11 ; body byte count
-	.db	00000000b
-	.db	00001000b
-	.db	10000000b
-	.db	00000000b
-	.db	00001000b
-	.db	10000000b
-	.db	00000000b
-	.db	00001000b
-	.db	10000000b
-	.db	00000000b
-	.db	00001000b
-	.db	8 ; remaining bits in final byte
-	.db	00000000b
-fontChar60: ; ` `
-	.db	5 ; body byte count
-	.db	00000111b
-	.db	11110000b
-	.db	00000000b
-	.db	00001000b
-	.db	00000000b
-	.db	8 ; remaining bits in final byte
-	.db	00000000b
 fontChar61: ; a a
 	.db	10 ; body byte count
 	.db	10000000b
@@ -1939,52 +1828,179 @@ fontChar7A: ; z z
 	.db	00000010b
 	.db	8 ; remaining bits in final byte
 	.db	00000000b
+fontChar3C: ; < <
+;	.db	10 ; body byte count
+;	.db	00100000b
+;	.db	00000000b
+;	.db	00000111b
+;	.db	11011000b
+;	.db	11000000b
+;	.db	00011000b
+;	.db	00000110b
+;	.db	00100011b
+;	.db	00100000b
+;	.db	00000000b
+;	.db	4 ; remaining bits in final byte
+;	.db	00000000b
+fontChar3E: ; > >
+;	.db	10 ; body byte count
+;	.db	00000010b
+;	.db	01100010b
+;	.db	00110000b
+;	.db	10001100b
+;	.db	10000001b
+;	.db	00001101b
+;	.db	01110000b
+;	.db	00000000b
+;	.db	00000010b
+;	.db	00000000b
+;	.db	4 ; remaining bits in final byte
+;	.db	00000000b
+fontChar40: ; @ @
+;	.db	11 ; body byte count
+;	.db	11111100b
+;	.db	11100001b
+;	.db	00111111b
+;	.db	00000010b
+;	.db	00100010b
+;	.db	00101111b
+;	.db	11110010b
+;	.db	11100010b
+;	.db	00101111b
+;	.db	01111100b
+;	.db	00000010b
+;	.db	8 ; remaining bits in final byte
+;	.db	00000000b
+fontChar5B: ; [ [
+;	.db	7 ; body byte count
+;	.db	11111110b
+;	.db	11100011b
+;	.db	00111111b
+;	.db	00000010b
+;	.db	00100010b
+;	.db	00100000b
+;	.db	00000000b
+;	.db	4 ; remaining bits in final byte
+;	.db	00000000b
+fontChar5C: ; \ \
+;	.db	7 ; body byte count
+;	.db	00011110b
+;	.db	10000000b
+;	.db	00000111b
+;	.db	11100000b
+;	.db	00000001b
+;	.db	01111000b
+;	.db	00000000b
+;	.db	4 ; remaining bits in final byte
+;	.db	00000000b
+fontChar5D: ; ] ]
+;	.db	7 ; body byte count
+;	.db	00000010b
+;	.db	00100010b
+;	.db	00100000b
+;	.db	11111110b
+;	.db	11100011b
+;	.db	00111111b
+;	.db	00000000b
+;	.db	4 ; remaining bits in final byte
+;	.db	00000000b
+fontChar5E: ; ^ ^
+;	.db	8 ; body byte count
+;	.db	00001100b
+;	.db	01100000b
+;	.db	00000000b
+;	.db	00000011b
+;	.db	01100000b
+;	.db	00000000b
+;	.db	00001100b
+;	.db	00000000b
+;	.db	8 ; remaining bits in final byte
+;	.db	00000000b
+fontChar5F: ; _ _
+;	.db	11 ; body byte count
+;	.db	00000000b
+;	.db	00001000b
+;	.db	10000000b
+;	.db	00000000b
+;	.db	00001000b
+;	.db	10000000b
+;	.db	00000000b
+;	.db	00001000b
+;	.db	10000000b
+;	.db	00000000b
+;	.db	00001000b
+;	.db	8 ; remaining bits in final byte
+;	.db	00000000b
 fontChar7B: ; { {
-	.db	8 ; body byte count
-	.db	00100000b
-	.db	11000000b
-	.db	00011111b
-	.db	11011110b
-	.db	00100011b
-	.db	00100000b
-	.db	00000010b
-	.db	00000010b
-	.db	8 ; remaining bits in final byte
-	.db	00000000b
+;	.db	8 ; body byte count
+;	.db	00100000b
+;	.db	11000000b
+;	.db	00011111b
+;	.db	11011110b
+;	.db	00100011b
+;	.db	00100000b
+;	.db	00000010b
+;	.db	00000010b
+;	.db	8 ; remaining bits in final byte
+;	.db	00000000b
 fontChar7C: ; | |
-	.db	4 ; body byte count
-	.db	11111110b
-	.db	11100111b
-	.db	01111111b
-	.db	00000000b
-	.db	4 ; remaining bits in final byte
-	.db	00000000b
+;	.db	4 ; body byte count
+;	.db	11111110b
+;	.db	11100111b
+;	.db	01111111b
+;	.db	00000000b
+;	.db	4 ; remaining bits in final byte
+;	.db	00000000b
 fontChar7D: ; } }
-	.db	7 ; body byte count
-	.db	00000010b
-	.db	11100010b
-	.db	00111101b
-	.db	11111100b
-	.db	00000001b
-	.db	00000010b
-	.db	00000000b
-	.db	4 ; remaining bits in final byte
-	.db	00000000b
+;	.db	7 ; body byte count
+;	.db	00000010b
+;	.db	11100010b
+;	.db	00111101b
+;	.db	11111100b
+;	.db	00000001b
+;	.db	00000010b
+;	.db	00000000b
+;	.db	4 ; remaining bits in final byte
+;	.db	00000000b
 fontChar7E: ; ~ ~
+;	.db	11 ; body byte count
+;	.db	00000100b
+;	.db	01100000b
+;	.db	00000000b
+;	.db	00000010b
+;	.db	01100000b
+;	.db	00000000b
+;	.db	00000100b
+;	.db	01100000b
+;	.db	00000000b
+;	.db	00000010b
+;	.db	00000000b
+;	.db	8 ; remaining bits in final byte
+;	.db	00000000b
+fontCharUnknown:
 	.db	11 ; body byte count
-	.db	00000100b
-	.db	01100000b
-	.db	00000000b
-	.db	00000010b
-	.db	01100000b
-	.db	00000000b
-	.db	00000100b
-	.db	01100000b
-	.db	00000000b
-	.db	00000010b
-	.db	00000000b
+	.db	11111110b
+	.db	00100111b
+	.db	01000000b
+	.db	00010010b
+	.db	10100100b
+	.db	01010100b
+	.db	00110010b
+	.db	00100100b
+	.db	01000000b
+	.db	11111110b
+	.db	00000111b
 	.db	8 ; remaining bits in final byte
 	.db	00000000b
+fontChar60: ; ` `
+;	.db	5 ; body byte count
+;	.db	00000111b
+;	.db	11110000b
+;	.db	00000000b
+;	.db	00001000b
+;	.db	00000000b
+;	.db	8 ; remaining bits in final byte
+;	.db	00000000b
 fontChar7F: ; ∞ Thin space
 	.db	1 ; body byte count
 	.db	00000000b
