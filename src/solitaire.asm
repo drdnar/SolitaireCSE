@@ -155,7 +155,7 @@
 .include "equates.asm"
 
 ;.define	FREECELL_DEBUG
-kdMaxSaveSlots	.equ	3	; 6 is the max or else you'll corrupt stuff
+kdMaxSaveSlots	.equ	6;3	; 6 is the max or else you'll corrupt stuff
 
 
 ;====== Header =================================================================
@@ -525,6 +525,7 @@ Panic:
 	call	DispHL
 	ld	a, ' '
 	call	PutC
+BuildWordLocaton	.equ	$ + 1
 	ld	hl, BUILD
 	call	DispDecimal
 	ld	hl, 0

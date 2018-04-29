@@ -673,4 +673,5 @@ textBackColor	.equ	textForeColor + 1
 ; Current text cursor location
 lcdRow		.equ	textBackColor + 1
 lcdCol		.equ	lcdRow + 1
-end_of_screen_var	.equ	lcdCol + 2
+lcdNewLineCol	.equ	lcdCol + 2
+end_of_screen_var	.equ	lcdNewLineCol + 2

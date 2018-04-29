@@ -248,6 +248,21 @@ _infoTable:
 	.db	128
 	.dw	fcPreviousGame
 
+;_versionCallback:
+;	; 13 bytes
+;	ld	ix, {@}
+;	jp	ShowNumbers
+;@:	.db	6
+;	.dw	180
+;	.db	200
+;	.dw	BuildWordLocaton
+	; 14 bytes
+;	ld	hl, 180
+;	ld	d, 200
+;	call	Locate
+;	ld	hl, BUILD
+;	jp	DispDecimal
+
 
 ;------ GUI Elements -----------------------------------------------------------
 gui_table_start:
@@ -312,67 +327,19 @@ _guicbn:; Controls banner
 	.dw	GuiDrawBanner		; Draw callback
 	.db	chThinSpace, chThinSpace, "CONTROLS", chThinSpace, 0
 _guict1:; Controls text 1
-	.dw	_guict2			; Pointer to next entry
+	.dw	_guiabn			; Pointer to next entry
 	.db	guiFlagStatic		; Flags & Type ID
 	.dw	173			; Column
 	.db	70			; Row
 	.db	0			; Width
 	.db	0			; Height
 	.dw	GuiDrawText		; Draw callback
-	.db	"Move: ", chArrowLeft, chArrowUp, chArrowDown, chArrowRight, 0
-_guict2:; Controls text 2
-	.dw	_guict3			; Pointer to next entry
-	.db	guiFlagStatic		; Flags & Type ID
-	.dw	173			; Column
-	.db	82			; Row
-	.db	0			; Width
-	.db	0			; Height
-	.dw	GuiDrawText		; Draw callback
-	.db	"Select: 2ND", 0
-_guict3:; Controls text 3
-	.dw	_guict4			; Pointer to next entry
-	.db	guiFlagStatic		; Flags & Type ID
-	.dw	173			; Column
-	.db	94			; Row
-	.db	0			; Width
-	.db	0			; Height
-	.dw	GuiDrawText		; Draw callback
-	.db	"Automove: ALPHA", 0
-_guict4:; Controls text 4
-	.dw	_guict5			; Pointer to next entry
-	.db	guiFlagStatic		; Flags & Type ID
-	.dw	173			; Column
-	.db	106			; Row
-	.db	0			; Width
-	.db	0			; Height
-	.dw	GuiDrawText		; Draw callback
-	.db	"Draw: Y=", 0
-_guict5:; Controls text 5
-	.dw	_guict6			; Pointer to next entry
-	.db	guiFlagStatic		; Flags & Type ID
-	.dw	173			; Column
-	.db	118			; Row
-	.db	0			; Width
-	.db	0			; Height
-	.dw	GuiDrawText		; Draw callback
-	.db	"Save & Quit: MODE", 0
-_guict6:; Controls text 6
-	.dw	_guict7			; Pointer to next entry
-	.db	guiFlagStatic		; Flags & Type ID
-	.dw	173			; Column
-	.db	130			; Row
-	.db	0			; Width
-	.db	0			; Height
-	.dw	GuiDrawText		; Draw callback
-	.db	"Forfeit: CLEAR", 0
-_guict7:; Controls text 7
-	.dw	_guiabn			; Pointer to next entry
-	.db	guiFlagStatic		; Flags & Type ID
-	.dw	173			; Column
-	.db	142			; Row
-	.db	0			; Width
-	.db	0			; Height
-	.dw	GuiDrawText		; Draw callback
+	.db	"Move: ", chArrowLeft, chArrowUp, chArrowDown, chArrowRight, chNewLine
+	.db	"Select: 2ND", chNewLine
+	.db	"Automove: ALPHA", chNewLine
+	.db	"Draw: Y=", chNewLine
+	.db	"Save & Quit: MODE", chNewLine
+	.db	"Forfeit: CLEAR", chNewLine
 	.db	"Undo: GRAPH", 0
 _guiabn:; About box
 	.dw	_guiabx			; Pointer to next entry
@@ -392,23 +359,29 @@ _guiabx:; About banner
 	.dw	GuiDrawBanner		; Draw callback
 	.db	chThinSpace, chThinSpace, "ABOUT", chThinSpace, 0
 _guiat1:; About text 1
-	.dw	_guiat2			; Pointer to next entry
+	.dw	_guiatn			; Pointer to next entry
 	.db	guiFlagStatic		; Flags & Type ID
 	.dw	173			; Column
 	.db	200			; Row
 	.db	0			; Width
 	.db	0			; Height
 	.dw	GuiDrawText		; Draw callback
-	.db	"v", VERSION, " by Dr. D'nar", 0
-_guiat2:; About text 2
+;	.db	"v", VERSION, " by Dr. D'nar", chNewLine
+	.db	"v0000 by Dr. D'nar", chNewLine
+	.db	"Y= for more info", 0
+_guiatn:; About build number
 	.dw	_guistbx		; Pointer to next entry
 	.db	guiFlagStatic		; Flags & Type ID
-	.dw	173			; Column
-	.db	212			; Row
+	.dw	180 - 2			; Column
+	.db	200			; Row
 	.db	0			; Width
 	.db	0			; Height
-	.dw	GuiDrawText		; Draw callback
-	.db	"Y= for more info", 0
+	.dw	GuiDrawNumberBox	; Draw callback
+;	.dw	0			; Enter key callback
+;	.dw	0			; Control below ptr
+;	.dw	0			; Control left ptr
+;	.dw	0			; Control right ptr
+;	.dw	0			; Control above ptr
 _guistbx:; Start box
 	.dw	0			; Pointer to next entry
 	.db	guiFlagStatic		; Flags & Type ID
@@ -417,6 +390,9 @@ _guistbx:; Start box
 	.db	130			; Width
 	.db	34			; Height
 	.dw	GuiDrawFilledBox	; Draw callback
+; So I'm just putting the data for the start button in the middle of the data
+; for the build number display.  Perfectly letgit thing to do.
+	.dw	BuildWordLocaton	; Pointer to location to write number
 
 
 guiRam_start:
