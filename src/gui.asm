@@ -94,6 +94,7 @@ ShowModalDialog:
 		pop	hl
 		call	PutS
 		; Draw lines of text
+#ifdef	NEVER
 		ld	b, 8
 		ld	c, 68
 @:		push	hl
@@ -106,6 +107,14 @@ ShowModalDialog:
 		pop	hl
 		call	PutS
 		djnz	{-1@}
+#endif
+		push	hl
+			ld	hl, 59
+			ld	d, 68
+			ld	(lcdNewLineCol), hl
+			call	Locate
+		pop	hl
+		call	PutS
 		; Draw button 1 text
 		push	hl
 			ex	de, hl
@@ -255,7 +264,19 @@ _gelkl:	; Key loop
 	jr	z, _f1
 	cp	skWindow
 	jr	z, _f2
+;	ld	hl, _gelKeyTable
+;	call	MapJumpTable
 	jr	_gelkl
+;_gelKeyTable:
+;	.db	skEnter
+;	.dw	_gelact
+;	.db	sk2nd
+;	.dw	_gelact
+;	.db	skYEqu
+;	.dw	_f1
+;	.db	skWindow
+;	.dw	_f2
+;	.db	0
 ; Movement subroutine
 _gelm:	; Recall that skDown = 1, skLeft = 2, &c.
 	; This converts the keycode into an offset and fetches the right pointer.
@@ -290,30 +311,22 @@ _gelact:; For various reasons, unhighlight control before sending it the event.
 	ld	l, (ix + 10)
 	ld	h, (ix + 11)
 	; If the callback field is zero, then it's not a valid callback.
-	ld	a, l
-	or	h
-	ret	z	; Recall that the callback itself returns via ret.
-	jp	(hl)
+_toHlButDontJumpToNull:	; Recall that the callback itself returns via ret.
+	jp	HlUnlessNull
 _f1:
 	bit	cursorShowing, (iy + guiFlags)
 	call	nz, _highlightItem
 	ld	hl, GuiEventLoop
 	push	hl
 	ld	hl, (f1GuiCallback)
-	ld	a, l
-	or	h
-	ret	z
-	jp	(hl)
+	jr	_toHlButDontJumpToNull
 _f2:
 	bit	cursorShowing, (iy + guiFlags)
 	call	nz, _highlightItem
 	ld	hl, GuiEventLoop
 	push	hl
 	ld	hl, (f2GuiCallback)
-	ld	a, l
-	or	h
-	ret	z
-	jp	(hl)
+	jr	_toHlButDontJumpToNull
 _highlightItem:
 	res	kbdCurFlash, (iy + mKbdFlags)
 	ld	hl, cursorPeriod
@@ -498,6 +511,8 @@ _ganbm:	call	GetKeyBlinky
 	jr	z, _gandone
 	cp	sk2nd
 	jr	z, _gandone
+;	ld	hl, _ganKeyTable
+;	call	MapJumpTable
 	ld	hl, numberTable
 	call	MapTable
 	jr	nz, _ganbm
@@ -530,7 +545,16 @@ _ganbm:	call	GetKeyBlinky
 	inc	hl
 	ld	(guiTemp), hl
 	jp	_ganbl
-
+;_ganKeyTable:
+;	.db	skClear
+;	.dw	_ganab
+;	.db	skLeft
+;	.dw	_ganbs
+;	.db	skEnter
+;	.dw	_gandone
+;	.db	sk2nd
+;	.dw	_gandone
+;	.db	0
 _ganbs:
 	ld	hl, (guiTemp)
 	ld	c, 10
@@ -679,6 +703,7 @@ GuiDrawBox:
 GuiDrawText:
 	ld	l, (ix + 3)
 	ld	h, (ix + 4)
+	ld	(lcdNewLineCol), hl
 	ld	d, (ix + 5)
 	call	Locate
 	push	ix

@@ -391,7 +391,7 @@ _guistbx:; Start box
 	.db	34			; Height
 	.dw	GuiDrawFilledBox	; Draw callback
 ; So I'm just putting the data for the start button in the middle of the data
-; for the build number display.  Perfectly letgit thing to do.
+; for the build number display.  Perfectly legit thing to do.
 	.dw	BuildWordLocaton	; Pointer to location to write number
 
 

@@ -23,14 +23,14 @@ statsDialog:
 	.dw	MainMenu				; Button 1 callback
 	.dw	MainMenu._about				; Button 2 callback
 	.db	"SOLITAIRE STATS", 0			; Title text
-	.db	"Klondike high score:", 0		; Line 1
-	.db	"Klondike games won:", 0		; Line 2
-	.db	"Klondike games forfeit:", 0		; Line 3
-	.db	"FreeCell games won:", 0		; Line 4
-	.db	"FreeCell games forfeit:", 0		; Line 5
+	.db	"Klondike high score:", chNewLine	; Line 1
+	.db	"Klondike games won:", chNewLine	; Line 2
+	.db	"Klondike games forfeit:", chNewLine	; Line 3
+	.db	"FreeCell games won:", chNewLine	; Line 4
+	.db	"FreeCell games forfeit:", chNewLine	; Line 5
 	.db	"Previous game number:", 0		; Line 6
-	.db	"", 0					; Line 7
-	.db	"", 0					; Line 8
+;	.db	"", 0					; Line 7
+;	.db	"", 0					; Line 8
 	.db	"OK", 0					; Button 1 text
 	.db	"ABOUT", 0				; Button 2 text
 aboutDialog:
@@ -38,14 +38,14 @@ aboutDialog:
 	.dw	MainMenu				; Button 1 callback
 	.dw	MainMenu._stats				; Button 2 callback
 	.db	"ABOUT SOLITAIRE", 0			; Title text
-	.db	"Written by Dr. D'nar.", 0		; Line 1
-	.db	"", 0					; Line 2
+	.db	"Written by Dr. D'nar.", chNewLine	; Line 1
+	.db	"", chNewLine				; Line 2
 	.db	"Optimized by Xeda and Runer112.", 0	; Line 3
-	.db	"", 0					; Line 4
-	.db	"", 0					; Line 5
-	.db	"", 0					; Line 6
-	.db	"", 0					; Line 7
-	.db	"", 0					; Line 8
+;	.db	"", 0					; Line 4
+;	.db	"", 0					; Line 5
+;	.db	"", 0					; Line 6
+;	.db	"", 0					; Line 7
+;	.db	"", 0					; Line 8
 	.db	"OK", 0					; Button 1 text
 	.db	"STATS", 0				; Button 2 text
 freeCellWinDialog:
@@ -53,14 +53,14 @@ freeCellWinDialog:
 	.dw	StartFreeCell				; Button 1 callback
 	.dw	MainMenu				; Button 2 callback
 	.db	"YOU WIN", 0				; Title text
-	.db	"Game:", 0				; Line 1
+	.db	"Game:", chNewLine			; Line 1
 	.db	"Moves:", 0				; Line 2
-	.db	"", 0					; Line 3
-	.db	"", 0					; Line 4
-	.db	"", 0					; Line 5
-	.db	"", 0					; Line 6
-	.db	"", 0					; Line 7
-	.db	"", 0					; Line 8
+;	.db	"", 0					; Line 3
+;	.db	"", 0					; Line 4
+;	.db	"", 0					; Line 5
+;	.db	"", 0					; Line 6
+;	.db	"", 0					; Line 7
+;	.db	"", 0					; Line 8
 	.db	"AGAIN", 0				; Button 1 text
 	.db	"QUIT", 0				; Button 2 text
 abortDialog:
@@ -68,14 +68,14 @@ abortDialog:
 	.dw	DoScreenRedraw				; Button 1 callback
 	.dw	DoForfeit				; Button 2 callback
 	.db	"FORFEIT GAME?", 0			; Title text
-	.db	"Your progress will not be saved.", 0	; Line 1
+	.db	"Your progress will not be saved.", chNewLine	; Line 1
 	.db	"(Use MODE to save and quit.)", 0	; Line 2
-	.db	"", 0					; Line 3
-	.db	"", 0					; Line 4
-	.db	"", 0					; Line 5
-	.db	"", 0					; Line 6
-	.db	"", 0					; Line 7
-	.db	"", 0					; Line 8
+;	.db	"", 0					; Line 3
+;	.db	"", 0					; Line 4
+;	.db	"", 0					; Line 5
+;	.db	"", 0					; Line 6
+;	.db	"", 0					; Line 7
+;	.db	"", 0					; Line 8
 	.db	"RESUME", 0				; Button 1 text
 	.db	"FORFEIT", 0				; Button 2 texterr
 klondikeWinDialog:
@@ -83,14 +83,14 @@ klondikeWinDialog:
 	.dw	StartKlondike				; Button 1 callback
 	.dw	MainMenu				; Button 2 callback
 	.db	"YOU WIN", 0				; Title text
-	.db	"Score:", 0				; Line 1
-	.db	"High score:", 0			; Line 2
-	.db	"Time:", 0				; Line 3
-	.db	"Time bonus:", 0			; Line 4
-	.db	"Games won:", 0				; Line 5
+	.db	"Score:", chNewLine			; Line 1
+	.db	"High score:", chNewLine		; Line 2
+	.db	"Time:", chNewLine			; Line 3
+	.db	"Time bonus:", chNewLine		; Line 4
+	.db	"Games won:", chNewLine			; Line 5
 	.db	"Games forfeit:", 0			; Line 6
-	.db	"", 0					; Line 7
-	.db	"", 0					; Line 8
+;	.db	"", 0					; Line 7
+;	.db	"", 0					; Line 8
 	.db	"AGAIN", 0				; Button 1 text
 	.db	"QUIT", 0				; Button 2 text
 errLowRam:
@@ -98,13 +98,13 @@ errLowRam:
 	.dw	MainMenu				; Button 1 callback
 	.dw	Quit					; Button 2 callback
 	.db	"LOW RAM", 0				; Title text
-	.db	"There is not enough free RAM for", 0	; Line 1
-	.db	"the save appvar. Archive or delete", 0	; Line 2
-	.db	"some variables.", 0			; Line 3
-	.db	"", 0					; Line 4
-	.db	"", 0					; Line 5
-	.db	"", 0					; Line 6
-	.db	"If you continue, the save feature", 0	; Line 7
+	.db	"There is not enough free RAM for", chNewLine	; Line 1
+	.db	"the save appvar. Archive or delete", chNewLine	; Line 2
+	.db	"some variables.", chNewLine		; Line 3
+	.db	"", chNewLine				; Line 4
+	.db	"", chNewLine				; Line 5
+	.db	"", chNewLine				; Line 6
+	.db	"If you continue, the save feature", chNewLine	; Line 7
 	.db	"will not function.", 0			; Line 8
 	.db	"OK", 0					; Button 1 text
 	.db	"QUIT", 0				; Button 2 text
@@ -113,13 +113,13 @@ errVersion:
 	.dw	MainMenu				; Button 1 callback
 	.dw	Quit					; Button 2 callback
 	.db	"VERSION MISMATCH", 0			; Title text
-	.db	"The save appvar is not compatible", 0	; Line 1
-	.db	"with this version of Solitaire.", 0	; Line 2
-	.db	"Delete the appvar, or load the", 0	; Line 3
-	.db	"matching version of Solitaire.", 0	; Line 4
-	.db	"", 0					; Line 5
-	.db	"", 0					; Line 6
-	.db	"If you continue, the save feature", 0	; Line 7
+	.db	"The save appvar is not compatible", chNewLine	; Line 1
+	.db	"with this version of Solitaire.", chNewLine	; Line 2
+	.db	"Delete the appvar, or load the", chNewLine	; Line 3
+	.db	"matching version of Solitaire.", chNewLine	; Line 4
+	.db	"", chNewLine				; Line 5
+	.db	"", chNewLine				; Line 6
+	.db	"If you continue, the save feature", chNewLine	; Line 7
 	.db	"will not function.", 0			; Line 8
 	.db	"OK", 0					; Button 1 text
 	.db	"QUIT", 0				; Button 2 text
@@ -128,13 +128,13 @@ errAppvarInUse:
 	.dw	MainMenu				; Button 1 callback
 	.dw	Quit					; Button 2 callback
 	.db	"APPVAR IN USE", 0			; Title text
-	.db	"An appvar named Solitair has been", 0	; Line 1
-	.db	"created by another application.", 0	; Line 2
-	.db	"Solitaire needs an appvar named", 0	; Line 3
-	.db	"Solitair for the game save feature.", 0; Line 4
-	.db	"Delete or rename the appvar.", 0	; Line 5
-	.db	"", 0					; Line 6
-	.db	"If you continue, the save feature", 0	; Line 7
+	.db	"An appvar named Solitair has been", chNewLine	; Line 1
+	.db	"created by another application.", chNewLine	; Line 2
+	.db	"Solitaire needs an appvar named", chNewLine	; Line 3
+	.db	"Solitair for the game save feature.", chNewLine	; Line 4
+	.db	"Delete or rename the appvar.", chNewLine	; Line 5
+	.db	"", chNewLine				; Line 6
+	.db	"If you continue, the save feature", chNewLine	; Line 7
 	.db	"will not function.", 0			; Line 8
 	.db	"OK", 0					; Button 1 text
 	.db	"QUIT", 0				; Button 2 text

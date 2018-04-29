@@ -22,8 +22,8 @@ PutS:
 	or	a
 	scf
 	ret	z
-;	cp	chNewLine
-;	jr	z, putSNewLine
+	cp	chNewLine
+	jr	z, putSNewLine
 	
 	push	hl
 	push	de
@@ -41,17 +41,17 @@ PutS:
 	inc	hl
 	call	PutC
 	jr	PutS
-;putSNewLine:
-;	push	hl
+putSNewLine:
+	push	hl
 ;	call	ClearEOL
-;	ld	a, (lcdRow)
-;	add	a, charHeight
-;	ld	(lcdRow), a
-;	ld	hl, 0
-;	ld	(lcdCol), hl
-;	call	FixCursor
-;	pop	hl
-;	jr	PutS
+	ld	a, (lcdRow)
+	add	a, charHeight
+	ld	(lcdRow), a
+	ld	hl, (lcdNewLineCol)
+	ld	(lcdCol), hl
+	call	FixCursor
+	pop	hl
+	jr	PutS
 
 
 .ifdef	NEVER
